@@ -3,6 +3,8 @@ import { persist, createJSONStorage } from 'zustand/middleware';
 import { nanoid } from 'nanoid';
 import type { Character, GameSave, HistoryEntry } from '@/lib/types';
 import { ageUp as runAgeUp } from '@/lib/engine/ageUp';
+import { resolveEvent as runResolveEvent } from '@/lib/engine/events';
+import { getEventById } from '@/lib/data/events';
 import { randomName, randomCountry } from '@/lib/data/names';
 
 function newCharacter(opts: { name?: string; country?: string }): Character {
@@ -29,6 +31,7 @@ function newCharacter(opts: { name?: string; country?: string }): Character {
     firedEventIds: [],
     history: [{ id: nanoid(), age: 0, text: `${name} was born in ${country}.` }],
     pendingEventId: null,
+    eventQueue: [],
   };
 }
 
@@ -40,6 +43,7 @@ interface GameState {
   loadLife: (id: string) => void;
   deleteLife: (id: string) => void;
   ageUp: () => void;
+  resolveEvent: (choiceIndex: number) => void;
   pushHistory: (text: string) => void;
   updateCharacter: (updater: (character: Character) => Character) => void;
   setHasHydrated: (hydrated: boolean) => void;
@@ -80,8 +84,24 @@ export const useGameStore = create<GameState>()(
         const { activeId, saves } = get();
         if (!activeId || !saves[activeId]) return;
         const current = saves[activeId].character;
-        if (!current.alive) return;
+        if (!current.alive || current.pendingEventId) return;
         const nextCharacter = runAgeUp(current);
+        set((state) => ({
+          saves: {
+            ...state.saves,
+            [activeId]: { character: nextCharacter, lastPlayed: Date.now() },
+          },
+        }));
+      },
+
+      resolveEvent: (choiceIndex: number) => {
+        const { activeId, saves } = get();
+        if (!activeId || !saves[activeId]) return;
+        const current = saves[activeId].character;
+        if (!current.pendingEventId) return;
+        const event = getEventById(current.pendingEventId);
+        if (!event) return;
+        const nextCharacter = runResolveEvent(current, event, choiceIndex);
         set((state) => ({
           saves: {
             ...state.saves,

@@ -1,0 +1,176 @@
+import type { LifeEvent } from '@/lib/types';
+
+export const CHILDHOOD_EVENTS: LifeEvent[] = [
+  {
+    id: 'child_bee_sting',
+    minAge: 3,
+    maxAge: 10,
+    weight: 10,
+    text: 'You got stung by a bee at the park.',
+    choices: [
+      { label: 'Cry about it', effects: { happiness: -5 }, resultText: 'You cried until your mom got you ice cream.' },
+      { label: 'Tough it out', effects: { health: -3, smarts: 2 }, resultText: 'You learned bees are jerks.' },
+    ],
+  },
+  {
+    id: 'child_first_steps',
+    minAge: 1,
+    maxAge: 1,
+    weight: 15,
+    once: true,
+    text: 'You took your first steps today!',
+    choices: [
+      { label: 'Wobble forward', effects: { happiness: 5 }, resultText: 'Everyone cheered as you toddled across the room.' },
+    ],
+  },
+  {
+    id: 'child_lost_tooth',
+    minAge: 5,
+    maxAge: 7,
+    weight: 12,
+    once: true,
+    text: 'Your first tooth fell out!',
+    choices: [
+      { label: 'Put it under your pillow', effects: { happiness: 5, money: 5 }, resultText: 'The tooth fairy left you $5.' },
+      { label: 'Show it off at school', effects: { happiness: 3 }, resultText: 'Your friends were grossed out and impressed.' },
+    ],
+  },
+  {
+    id: 'child_bully',
+    minAge: 6,
+    maxAge: 12,
+    weight: 8,
+    text: 'A bully at school took your lunch money.',
+    choices: [
+      { label: 'Tell a teacher', effects: { happiness: -2, smarts: 2 }, resultText: 'The bully got detention, but now everyone calls you a snitch.' },
+      { label: 'Stand up to them', effects: { health: -5, happiness: 4 }, resultText: 'You got a bruise but earned some respect.' },
+      { label: 'Let it go', effects: { happiness: -5 }, resultText: 'You went hungry at lunch and felt small all day.' },
+    ],
+  },
+  {
+    id: 'child_pet',
+    minAge: 4,
+    maxAge: 10,
+    weight: 9,
+    once: true,
+    text: 'Your parents asked if you want a pet.',
+    choices: [
+      { label: 'Get a dog', effects: { happiness: 8, money: -20 }, resultText: 'You named it Buddy and you\'re inseparable.' },
+      { label: 'Get a fish', effects: { happiness: 3, money: -5 }, resultText: 'It mostly just swims in circles, but it\'s yours.' },
+      { label: 'No pets, thanks', effects: {}, resultText: 'You decided pets are too much responsibility.' },
+    ],
+  },
+  {
+    id: 'child_report_card',
+    minAge: 6,
+    maxAge: 12,
+    weight: 10,
+    text: 'Report cards came out today.',
+    choices: [
+      { label: 'Study hard next term', effects: { smarts: 4, happiness: -1 }, resultText: 'You buckled down and your grades improved.' },
+      { label: 'Shrug it off', effects: { happiness: 2, smarts: -2 }, resultText: 'Grades aren\'t everything, right?' },
+    ],
+  },
+  {
+    id: 'child_playground_fall',
+    minAge: 3,
+    maxAge: 9,
+    weight: 8,
+    text: 'You fell off the monkey bars at the playground.',
+    choices: [
+      { label: 'Get back up', effects: { health: -4, happiness: 1 }, resultText: 'You brushed it off like a champ.' },
+      { label: 'Cry for your parents', effects: { health: -4, happiness: -2 }, resultText: 'You needed a band-aid and a hug.' },
+    ],
+  },
+  {
+    id: 'child_talent_show',
+    minAge: 7,
+    maxAge: 12,
+    weight: 7,
+    once: true,
+    text: 'Your school is holding a talent show.',
+    choices: [
+      { label: 'Perform something', effects: { happiness: 6, looks: 2 }, resultText: 'You nailed it and the crowd loved you.' },
+      { label: 'Watch from the audience', effects: { happiness: 1 }, resultText: 'You cheered for your friends instead.' },
+    ],
+  },
+  {
+    id: 'child_sibling_fight',
+    minAge: 4,
+    maxAge: 12,
+    weight: 9,
+    text: 'You got into a fight with your sibling over a toy.',
+    choices: [
+      { label: 'Share it', effects: { happiness: 2 }, resultText: 'You two ended up playing together.' },
+      { label: 'Refuse to share', effects: { happiness: -3 }, resultText: 'You both got sent to timeout.' },
+    ],
+  },
+  {
+    id: 'child_summer_camp',
+    minAge: 8,
+    maxAge: 12,
+    weight: 7,
+    once: true,
+    text: 'Your parents signed you up for summer camp.',
+    choices: [
+      { label: 'Make new friends', effects: { happiness: 5, smarts: 1 }, resultText: 'You had a blast and stayed in touch with a few campers.' },
+      { label: 'Stay in your cabin', effects: { happiness: -2 }, resultText: 'You mostly kept to yourself and counted the days.' },
+    ],
+  },
+  {
+    id: 'child_broke_something',
+    minAge: 5,
+    maxAge: 11,
+    weight: 8,
+    text: 'You accidentally broke a vase in the house.',
+    choices: [
+      { label: 'Confess', effects: { happiness: -2, smarts: 2 }, resultText: 'You got grounded, but your parents appreciated the honesty.' },
+      { label: 'Hide it', effects: { happiness: 1, smarts: -2 }, resultText: 'You got away with it, for now.' },
+    ],
+  },
+  {
+    id: 'child_reading',
+    minAge: 5,
+    maxAge: 12,
+    weight: 9,
+    text: 'The library was giving away free books.',
+    choices: [
+      { label: 'Grab a stack', effects: { smarts: 4, happiness: 2 }, resultText: 'You spent the week buried in books.' },
+      { label: 'Not interested', effects: {}, resultText: 'You went to play outside instead.' },
+    ],
+  },
+  {
+    id: 'child_recital',
+    minAge: 6,
+    maxAge: 12,
+    weight: 6,
+    text: 'You had a piano recital coming up.',
+    choices: [
+      { label: 'Practice every day', effects: { smarts: 2, happiness: -1 }, resultText: 'You played almost perfectly on stage.' },
+      { label: 'Wing it', effects: { happiness: 1, looks: -1 }, resultText: 'You fumbled a few notes but had fun anyway.' },
+    ],
+  },
+  {
+    id: 'child_chickenpox',
+    minAge: 3,
+    maxAge: 9,
+    weight: 6,
+    once: true,
+    text: 'You caught chickenpox.',
+    choices: [
+      { label: 'Rest it out', effects: { health: -8, happiness: -3 }, resultText: 'It was itchy and miserable, but you recovered.' },
+    ],
+  },
+  {
+    id: 'child_moved_house',
+    minAge: 5,
+    maxAge: 12,
+    weight: 5,
+    once: true,
+    text: 'Your family moved to a new house.',
+    choices: [
+      { label: 'Explore the new neighborhood', effects: { happiness: 3 }, resultText: 'You found a cool spot to hang out already.' },
+      { label: 'Miss your old friends', effects: { happiness: -4 }, resultText: 'You wrote letters to your old friends.' },
+    ],
+  },
+];

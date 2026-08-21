@@ -3,8 +3,10 @@
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useGameStore } from '@/lib/store';
+import { getEventById } from '@/lib/data/events';
 import { StatPanel } from '@/components/game/StatPanel';
 import { EventLog } from '@/components/game/EventLog';
+import { EventCard } from '@/components/game/EventCard';
 import { AgeUpButton } from '@/components/game/AgeUpButton';
 import { DeathScreen } from '@/components/game/DeathScreen';
 
@@ -13,9 +15,11 @@ export default function GamePage() {
   const activeId = useGameStore((state) => state.activeId);
   const saves = useGameStore((state) => state.saves);
   const ageUp = useGameStore((state) => state.ageUp);
+  const resolveEvent = useGameStore((state) => state.resolveEvent);
   const hasHydrated = useGameStore((state) => state.hasHydrated);
 
   const character = activeId ? saves[activeId]?.character : undefined;
+  const pendingEvent = character?.pendingEventId ? getEventById(character.pendingEventId) : undefined;
 
   useEffect(() => {
     if (hasHydrated && !character) {
@@ -41,7 +45,8 @@ export default function GamePage() {
       {character.alive ? (
         <>
           <EventLog history={character.history} />
-          <AgeUpButton onAgeUp={ageUp} />
+          {pendingEvent && <EventCard event={pendingEvent} onChoose={resolveEvent} />}
+          <AgeUpButton onAgeUp={ageUp} disabled={Boolean(pendingEvent)} />
         </>
       ) : (
         <DeathScreen character={character} />

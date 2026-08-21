@@ -73,9 +73,39 @@ export interface Character {
 
   history: HistoryEntry[];
   pendingEventId: string | null;
+  eventQueue: string[];
 }
 
 export interface GameSave {
   character: Character;
   lastPlayed: number;
+}
+
+export type RelationshipStatus = 'single' | 'partnered' | 'married';
+
+export interface EventChoice {
+  label: string;
+  effects: Partial<Record<StatKey | 'money', number>>;
+  resultText: string;
+  achievementId?: string;
+}
+
+export interface EventRequirements {
+  minStats?: Partial<Record<StatKey, number>>;
+  maxStats?: Partial<Record<StatKey, number>>;
+  educationLevel?: EducationState['level'][];
+  hasJob?: boolean;
+  relationshipStatus?: RelationshipStatus[];
+  minMoney?: number;
+}
+
+export interface LifeEvent {
+  id: string;
+  minAge: number;
+  maxAge: number;
+  weight: number;
+  once?: boolean;
+  requires?: EventRequirements;
+  text: string;
+  choices: EventChoice[];
 }

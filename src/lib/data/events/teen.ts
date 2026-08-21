@@ -1,0 +1,144 @@
+import type { LifeEvent } from '@/lib/types';
+
+export const TEEN_EVENTS: LifeEvent[] = [
+  {
+    id: 'teen_first_job',
+    minAge: 15,
+    maxAge: 17,
+    weight: 10,
+    once: true,
+    requires: { hasJob: false },
+    text: 'A local shop is hiring for a part-time gig.',
+    choices: [
+      { label: 'Take the job', effects: { money: 30, happiness: -1 }, resultText: 'You worked weekends and saved up some cash.' },
+      { label: 'Focus on school instead', effects: { smarts: 3 }, resultText: 'You spent the extra time studying.' },
+    ],
+  },
+  {
+    id: 'teen_first_crush',
+    minAge: 13,
+    maxAge: 16,
+    weight: 9,
+    once: true,
+    text: 'You developed a crush on someone at school.',
+    choices: [
+      { label: 'Ask them out', effects: { happiness: 6, looks: 1 }, resultText: 'They said yes! You went on your first date.' },
+      { label: 'Keep it to yourself', effects: { happiness: -2 }, resultText: 'You admired from afar, wondering "what if".' },
+    ],
+  },
+  {
+    id: 'teen_party_invite',
+    minAge: 14,
+    maxAge: 17,
+    weight: 9,
+    text: 'You got invited to a party this weekend.',
+    choices: [
+      { label: 'Go and have fun', effects: { happiness: 6, health: -2 }, resultText: 'You danced all night and made new friends.' },
+      { label: 'Stay home and study', effects: { smarts: 3, happiness: -2 }, resultText: 'You got ahead on your homework instead.' },
+    ],
+  },
+  {
+    id: 'teen_drivers_license',
+    minAge: 16,
+    maxAge: 17,
+    weight: 12,
+    once: true,
+    text: 'You\'re old enough to take your driver\'s test.',
+    choices: [
+      { label: 'Take the test', effects: { happiness: 5, money: -20 }, resultText: 'You passed on the first try!' },
+      { label: 'Wait a while longer', effects: {}, resultText: 'You decided you weren\'t ready yet.' },
+    ],
+  },
+  {
+    id: 'teen_peer_pressure',
+    minAge: 14,
+    maxAge: 18,
+    weight: 8,
+    text: 'Friends are pressuring you to try smoking.',
+    choices: [
+      { label: 'Refuse', effects: { happiness: -1, smarts: 1 }, resultText: 'You stood your ground, even though it was awkward.' },
+      { label: 'Give in', effects: { health: -6, happiness: 2 }, resultText: 'You regretted it almost immediately.' },
+    ],
+  },
+  {
+    id: 'teen_sports_team',
+    minAge: 13,
+    maxAge: 18,
+    weight: 9,
+    once: true,
+    text: 'Tryouts for the school sports team are happening.',
+    choices: [
+      { label: 'Try out', effects: { health: 5, happiness: 4 }, resultText: 'You made the team and loved every practice.' },
+      { label: 'Skip it', effects: {}, resultText: 'Sports aren\'t really your thing.' },
+    ],
+  },
+  {
+    id: 'teen_grades_slip',
+    minAge: 14,
+    maxAge: 18,
+    weight: 8,
+    text: 'Your grades started slipping this semester.',
+    choices: [
+      { label: 'Get a tutor', effects: { smarts: 5, money: -15 }, resultText: 'Your grades bounced back with some help.' },
+      { label: 'Don\'t worry about it', effects: { smarts: -3 }, resultText: 'You figured it would sort itself out.' },
+    ],
+  },
+  {
+    id: 'teen_heartbreak',
+    minAge: 15,
+    maxAge: 18,
+    weight: 7,
+    text: 'Your first relationship ended.',
+    choices: [
+      { label: 'Talk to friends about it', effects: { happiness: 2 }, resultText: 'Venting helped you feel better.' },
+      { label: 'Bottle it up', effects: { happiness: -6 }, resultText: 'You kept it all inside and it weighed on you.' },
+    ],
+  },
+  {
+    id: 'teen_college_prep',
+    minAge: 16,
+    maxAge: 18,
+    weight: 9,
+    once: true,
+    text: 'It\'s time to start thinking about college applications.',
+    choices: [
+      { label: 'Start preparing early', effects: { smarts: 4, happiness: -1 }, resultText: 'You got a head start on essays and test prep.' },
+      { label: 'Procrastinate', effects: { happiness: 2, smarts: -2 }, resultText: 'You figured you\'d deal with it later.' },
+    ],
+  },
+  {
+    id: 'teen_part_time_savings',
+    minAge: 15,
+    maxAge: 18,
+    weight: 6,
+    requires: { hasJob: true },
+    text: 'You got your first paycheck.',
+    choices: [
+      { label: 'Save it', effects: { money: 40, happiness: 1 }, resultText: 'You put it straight into savings.' },
+      { label: 'Spend it', effects: { happiness: 5 }, resultText: 'You blew it all on something fun.' },
+    ],
+  },
+  {
+    id: 'teen_curfew_broken',
+    minAge: 14,
+    maxAge: 18,
+    weight: 7,
+    text: 'You missed curfew after losing track of time with friends.',
+    choices: [
+      { label: 'Apologize and explain', effects: { happiness: -1 }, resultText: 'Your parents were annoyed but understanding.' },
+      { label: 'Sneak in quietly', effects: { happiness: 1, smarts: -1 }, resultText: 'You got away with it... this time.' },
+    ],
+  },
+  {
+    id: 'teen_gym_habit',
+    minAge: 13,
+    maxAge: 18,
+    weight: 6,
+    once: true,
+    text: 'A friend invited you to start working out together.',
+    choices: [
+      { label: 'Join them', effects: { health: 6, looks: 3 }, resultText: 'You picked up a healthy habit that stuck.' },
+      { label: 'Pass', effects: {}, resultText: 'Maybe another time.' },
+    ],
+  },
+];

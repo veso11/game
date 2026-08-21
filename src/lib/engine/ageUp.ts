@@ -1,5 +1,7 @@
 import type { Character, HistoryEntry } from '@/lib/types';
 import { applyEffects } from '@/lib/engine/stats';
+import { pickEventsForYear } from '@/lib/engine/events';
+import { ALL_EVENTS } from '@/lib/data/events';
 import { randInt, chance } from '@/lib/rng';
 import { nanoid } from 'nanoid';
 
@@ -41,6 +43,13 @@ export function ageUp(character: Character): Character {
     next.alive = false;
     next.causeOfDeath = next.health <= 0 ? 'Poor health' : 'Old age';
     next.history = [...next.history, entry(newAge, `You passed away at age ${newAge}. Cause: ${next.causeOfDeath}.`)];
+    return next;
+  }
+
+  const events = pickEventsForYear(next, ALL_EVENTS);
+  if (events.length > 0) {
+    next.pendingEventId = events[0].id;
+    next.eventQueue = events.slice(1).map((e) => e.id);
   }
 
   return next;
