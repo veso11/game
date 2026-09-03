@@ -1,6 +1,10 @@
 import type { Character, HistoryEntry } from '@/lib/types';
 import { applyEffects } from '@/lib/engine/stats';
 import { pickEventsForYear } from '@/lib/engine/events';
+import { applyCareerYearlyTick } from '@/lib/engine/career';
+import { applyRelationshipYearlyTick } from '@/lib/engine/relationships';
+import { applyEducationYearlyTick } from '@/lib/engine/education';
+import { applyAssetYearlyTick } from '@/lib/engine/assets';
 import { ALL_EVENTS } from '@/lib/data/events';
 import { randInt, chance } from '@/lib/rng';
 import { nanoid } from 'nanoid';
@@ -38,6 +42,11 @@ export function ageUp(character: Character): Character {
   };
   next = applyEffects(next, drift);
   next.history = [...next.history, entry(newAge, `You turned ${newAge}.`)];
+
+  next = applyEducationYearlyTick(next);
+  next = applyCareerYearlyTick(next);
+  next = applyRelationshipYearlyTick(next);
+  next = applyAssetYearlyTick(next);
 
   if (rollDeath(newAge, next.health)) {
     next.alive = false;

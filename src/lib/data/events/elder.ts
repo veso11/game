@@ -10,8 +10,13 @@ export const ELDER_EVENTS: LifeEvent[] = [
     requires: { hasJob: true },
     text: 'You\'re eligible to retire from your job.',
     choices: [
-      { label: 'Retire', effects: { happiness: 8, money: 0 }, resultText: 'You said goodbye to the working world for good.' },
-      { label: 'Keep working', effects: { money: 20, happiness: -2 }, resultText: 'You weren\'t ready to slow down yet.' },
+      {
+        label: 'Retire',
+        effects: { happiness: 8, money: 100 },
+        jobEffect: { type: 'quit' },
+        resultText: 'You said goodbye to the working world for good, with a modest pension.',
+      },
+      { label: 'Keep working', effects: { happiness: -2 }, resultText: 'You weren\'t ready to slow down yet.' },
     ],
   },
   {
@@ -80,6 +85,23 @@ export const ELDER_EVENTS: LifeEvent[] = [
     choices: [
       { label: 'Get it checked out', effects: { health: -3, money: -15 }, resultText: 'Just a bruise, but better safe than sorry.' },
       { label: 'Walk it off', effects: { health: -6 }, resultText: 'It was worse than you thought.' },
+    ],
+  },
+  {
+    id: 'elder_anniversary',
+    minAge: 65,
+    maxAge: 95,
+    weight: 7,
+    requires: { relationshipStatus: ['married'] },
+    text: 'It\'s your wedding anniversary.',
+    choices: [
+      {
+        label: 'Celebrate together',
+        effects: { happiness: 8, money: -20 },
+        relationshipEffect: { type: 'modifyMeter', relation: 'spouse', delta: 12 },
+        resultText: 'Decades later and still smitten.',
+      },
+      { label: 'A quiet toast at home', effects: { happiness: 4 }, resultText: 'Simple, but sweet.' },
     ],
   },
   {

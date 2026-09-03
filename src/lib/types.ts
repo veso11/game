@@ -9,6 +9,13 @@ export interface Person {
   relationshipMeter: number; // 0-100
 }
 
+export type RelationshipEffect =
+  | { type: 'addPerson'; relation: Person['relation']; startingMeter?: number }
+  | { type: 'modifyMeter'; relation: Person['relation']; delta: number }
+  | { type: 'marry'; relation: 'partner' }
+  | { type: 'breakup'; relation: 'partner' | 'spouse' }
+  | { type: 'kill'; relation: Person['relation']; cause?: string };
+
 export interface Job {
   id: string;
   title: string;
@@ -17,6 +24,23 @@ export interface Job {
   yearsInJob: number;
   performance: number; // 0-100
 }
+
+export interface JobListing {
+  id: string;
+  title: string;
+  minEducationLevel: EducationState['level'];
+  minSmarts: number;
+  minAge: number;
+  baseSalaryPerYear: number;
+  maxLevel: number;
+}
+
+export type JobEffect =
+  | { type: 'grantJob'; listingId: string }
+  | { type: 'promote' }
+  | { type: 'quit' }
+  | { type: 'fire' }
+  | { type: 'performanceDelta'; delta: number };
 
 export interface EducationState {
   level: 'none' | 'primary' | 'highschool' | 'university' | 'gradschool';
@@ -27,6 +51,11 @@ export interface EducationState {
   dropoutFlag: boolean;
 }
 
+export type EducationEffect =
+  | { type: 'enroll'; level: EducationState['level']; major?: string }
+  | { type: 'dropout' }
+  | { type: 'gpaDelta'; delta: number };
+
 export interface AssetItem {
   id: string;
   catalogId: string;
@@ -35,6 +64,17 @@ export interface AssetItem {
   value: number;
   happinessBonus: number;
 }
+
+export interface AssetCatalogEntry {
+  id: string;
+  type: AssetItem['type'];
+  name: string;
+  cost: number;
+  happinessBonus: number;
+  upkeepPerYear: number;
+}
+
+export type AssetEffect = { type: 'buy'; catalogId: string } | { type: 'sell'; assetId: string };
 
 export interface HistoryEntry {
   id: string;
@@ -88,6 +128,10 @@ export interface EventChoice {
   effects: Partial<Record<StatKey | 'money', number>>;
   resultText: string;
   achievementId?: string;
+  jobEffect?: JobEffect;
+  relationshipEffect?: RelationshipEffect;
+  educationEffect?: EducationEffect;
+  assetEffect?: AssetEffect;
 }
 
 export interface EventRequirements {
@@ -97,6 +141,9 @@ export interface EventRequirements {
   hasJob?: boolean;
   relationshipStatus?: RelationshipStatus[];
   minMoney?: number;
+  maxMoney?: number;
+  minRelationshipMeter?: { relation: Person['relation']; min: number };
+  hasAssetType?: AssetItem['type'];
 }
 
 export interface LifeEvent {
