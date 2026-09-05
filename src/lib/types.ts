@@ -126,6 +126,16 @@ export interface CrimeDefinition {
   arrestChanceOnFailure: number;
 }
 
+export interface StockHolding {
+  symbol: string;
+  shares: number;
+  avgCost: number;
+}
+
+export interface MarketState {
+  prices: Record<string, number[]>; // oldest-first, last = current
+}
+
 export interface Character {
   id: string;
   name: string;
@@ -149,6 +159,8 @@ export interface Character {
   achievements: string[];
   criminalRecord: CriminalRecord;
   firedEventIds: string[];
+  portfolio: StockHolding[];
+  market: MarketState;
 
   history: HistoryEntry[];
   pendingEventId: string | null;

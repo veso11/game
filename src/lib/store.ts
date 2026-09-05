@@ -19,6 +19,7 @@ import {
 import { enroll as runEnroll, dropOut as runDropOut, study as runStudy } from '@/lib/engine/education';
 import { buyAsset as runBuyAsset, sellAsset as runSellAsset } from '@/lib/engine/assets';
 import { commitCrime as runCommitCrime } from '@/lib/engine/crime';
+import { buy as runBuyStock, sell as runSellStock, initMarket } from '@/lib/market/engine';
 import { getEventById } from '@/lib/data/events';
 import { randomName, randomCountry } from '@/lib/data/names';
 
@@ -45,6 +46,8 @@ function newCharacter(opts: { name?: string; country?: string }): Character {
     achievements: [],
     criminalRecord: { inJail: false, yearsLeft: 0, convictions: 0 },
     firedEventIds: [],
+    portfolio: [],
+    market: initMarket(),
     history: [{ id: nanoid(), age: 0, text: `${name} was born in ${country}.` }],
     pendingEventId: null,
     eventQueue: [],
@@ -77,6 +80,8 @@ interface GameState {
   sellAsset: (assetId: string) => void;
   applyCasinoResult: (moneyDelta: number) => void;
   commitCrime: (crimeId: string) => void;
+  buyStock: (symbol: string, shares: number) => void;
+  sellStock: (symbol: string, shares: number) => void;
 }
 
 export const useGameStore = create<GameState>()(
@@ -339,6 +344,34 @@ export const useGameStore = create<GameState>()(
         const current = saves[activeId].character;
         if (!current.alive || current.pendingEventId || current.criminalRecord.inJail) return;
         const nextCharacter = runCommitCrime(current, crimeId);
+        set((state) => ({
+          saves: {
+            ...state.saves,
+            [activeId]: { character: nextCharacter, lastPlayed: Date.now() },
+          },
+        }));
+      },
+
+      buyStock: (symbol: string, shares: number) => {
+        const { activeId, saves } = get();
+        if (!activeId || !saves[activeId]) return;
+        const current = saves[activeId].character;
+        if (!current.alive || current.pendingEventId || current.criminalRecord.inJail) return;
+        const { character: nextCharacter } = runBuyStock(current, symbol, shares);
+        set((state) => ({
+          saves: {
+            ...state.saves,
+            [activeId]: { character: nextCharacter, lastPlayed: Date.now() },
+          },
+        }));
+      },
+
+      sellStock: (symbol: string, shares: number) => {
+        const { activeId, saves } = get();
+        if (!activeId || !saves[activeId]) return;
+        const current = saves[activeId].character;
+        if (!current.alive || current.pendingEventId || current.criminalRecord.inJail) return;
+        const { character: nextCharacter } = runSellStock(current, symbol, shares);
         set((state) => ({
           saves: {
             ...state.saves,

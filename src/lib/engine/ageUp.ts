@@ -6,6 +6,7 @@ import { applyRelationshipYearlyTick } from '@/lib/engine/relationships';
 import { applyEducationYearlyTick } from '@/lib/engine/education';
 import { applyAssetYearlyTick } from '@/lib/engine/assets';
 import { applyCrimeYearlyTick } from '@/lib/engine/crime';
+import { applyMarketYearlyTick } from '@/lib/market/engine';
 import { ALL_EVENTS } from '@/lib/data/events';
 import { randInt, chance } from '@/lib/rng';
 import { nanoid } from 'nanoid';
@@ -49,6 +50,7 @@ export function ageUp(character: Character): Character {
   next = applyRelationshipYearlyTick(next);
   next = applyAssetYearlyTick(next);
   next = applyCrimeYearlyTick(next);
+  next = applyMarketYearlyTick(next);
 
   if (rollDeath(newAge, next.health)) {
     next.alive = false;

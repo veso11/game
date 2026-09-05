@@ -1,4 +1,5 @@
 import type { Character } from '@/lib/types';
+import { initMarket } from '@/lib/market/engine';
 
 export function baseCharacter(overrides: Partial<Character> = {}): Character {
   return {
@@ -21,6 +22,8 @@ export function baseCharacter(overrides: Partial<Character> = {}): Character {
     achievements: [],
     criminalRecord: { inJail: false, yearsLeft: 0, convictions: 0 },
     firedEventIds: [],
+    portfolio: [],
+    market: initMarket(),
     history: [],
     pendingEventId: null,
     eventQueue: [],
