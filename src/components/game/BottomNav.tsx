@@ -48,7 +48,7 @@ export function BottomNav() {
           <Link
             key={item.href}
             href={item.href}
-            className={`flex-1 py-2 text-center text-xs font-semibold transition-colors ${
+            className={`flex-1 truncate whitespace-nowrap px-0.5 py-2 text-center text-xs font-semibold transition-colors ${
               active
                 ? 'text-emerald-600 dark:text-emerald-400'
                 : 'text-neutral-500 dark:text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-200'
