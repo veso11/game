@@ -123,6 +123,8 @@ export function applyEducationEffect(character: Character, effect: EducationEffe
  * drift is silent; only tier transitions are logged.
  */
 export function applyEducationYearlyTick(character: Character): Character {
+  if (character.criminalRecord.inJail) return character;
+
   const edu = character.education;
 
   if (edu.level === 'none' && !edu.dropoutFlag && character.age >= AUTO_ENROLL_AGE) {
