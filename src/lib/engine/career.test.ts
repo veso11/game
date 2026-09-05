@@ -11,7 +11,7 @@ import {
 } from './career';
 import { baseCharacter } from '@/lib/testUtils';
 import { setRngSource, resetRngSource } from '@/lib/rng';
-import { JOB_CATALOG } from '@/lib/data/jobs';
+import { JOB_CATALOG, getJobListingById } from '@/lib/data/jobs';
 import type { Job, JobListing } from '@/lib/types';
 
 function job(overrides: Partial<Job> = {}): Job {
@@ -439,6 +439,77 @@ describe('applyCareerYearlyTick', () => {
     const next = applyCareerYearlyTick(char);
     expect(next.job?.level).toBe(3);
     expect(next.history).toHaveLength(0);
+  });
+});
+
+describe('fame careers (singer/actor/sports)', () => {
+  it('eligibility is independent per primary stat: high-talent/low-smarts qualifies for singer/soccer_player but not software_engineer, and vice versa', () => {
+    const talented = baseCharacter({
+      age: 25,
+      smarts: 5,
+      talent: 90,
+      health: 90,
+      education: { level: 'none', enrolled: false, dropoutFlag: false },
+    });
+    const talentedJobs = listAvailableJobs(talented);
+    expect(talentedJobs.some((j) => j.id === 'singer')).toBe(true);
+    expect(talentedJobs.some((j) => j.id === 'soccer_player')).toBe(true);
+    expect(talentedJobs.some((j) => j.id === 'software_engineer')).toBe(false);
+
+    const smart = baseCharacter({
+      age: 25,
+      smarts: 90,
+      talent: 5,
+      health: 90,
+      education: { level: 'university', enrolled: false, dropoutFlag: false, major: 'computer_science' },
+    });
+    const smartJobs = listAvailableJobs(smart);
+    expect(smartJobs.some((j) => j.id === 'software_engineer')).toBe(true);
+    expect(smartJobs.some((j) => j.id === 'singer')).toBe(false);
+  });
+
+  it('promotes singer through all 5 levels with the exact salary sequence 8,000 -> 48,000 -> 288,000 -> 1,728,000 -> 10,368,000, updating title at each step', () => {
+    const singerListing = getJobListingById('singer')!;
+    let character = baseCharacter({
+      job: {
+        id: 'j1',
+        listingId: 'singer',
+        title: singerListing.levelTitles![0],
+        salaryPerYear: singerListing.baseSalaryPerYear,
+        level: 1,
+        yearsInJob: 0,
+        performance: 50,
+      },
+    });
+
+    expect(character.job?.salaryPerYear).toBe(8000);
+
+    const expectedSalaries = [48000, 288000, 1728000, 10368000];
+    const expectedTitles = singerListing.levelTitles!;
+
+    expectedSalaries.forEach((expectedSalary, i) => {
+      character = applyJobEffect(character, { type: 'promote' });
+      expect(character.job?.level).toBe(i + 2);
+      expect(character.job?.salaryPerYear).toBe(expectedSalary);
+      expect(character.job?.title).toBe(expectedTitles[i + 1]);
+    });
+
+    // Now at level 5 (maxLevel) — a 6th promote attempt is a no-op.
+    expect(character.job?.level).toBe(5);
+    const atCap = character;
+    const next = applyJobEffect(atCap, { type: 'promote' });
+    expect(next).toBe(atCap);
+  });
+
+  it('hireChance for soccer_player is driven by health (not looks) as the secondary stat', () => {
+    const soccerListing = getJobListingById('soccer_player')!;
+    const highHealth = baseCharacter({ talent: 70, health: 90, looks: 10 });
+    const lowHealth = baseCharacter({ talent: 70, health: 10, looks: 10 });
+    const highLooks = baseCharacter({ talent: 70, health: 50, looks: 90 });
+    const lowLooks = baseCharacter({ talent: 70, health: 50, looks: 10 });
+
+    expect(hireChance(highHealth, soccerListing)).not.toBeCloseTo(hireChance(lowHealth, soccerListing));
+    expect(hireChance(highLooks, soccerListing)).toBeCloseTo(hireChance(lowLooks, soccerListing));
   });
 });
 
