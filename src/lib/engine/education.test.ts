@@ -185,4 +185,13 @@ describe('applyEducationYearlyTick', () => {
     const char = baseCharacter({ education: education({ level: 'university', enrolled: true, currentGrade: 1 }) });
     expect(applyEducationYearlyTick(char)).toBe(char);
   });
+
+  it('no-ops entirely while jailed, even mid-grade', () => {
+    const char = baseCharacter({
+      age: 6,
+      education: education({ level: 'primary', enrolled: true, currentGrade: 1 }),
+      criminalRecord: { inJail: true, yearsLeft: 2, convictions: 1 },
+    });
+    expect(applyEducationYearlyTick(char)).toBe(char);
+  });
 });
