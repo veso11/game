@@ -110,6 +110,22 @@ export interface CriminalRecord {
   convictions: number;
 }
 
+export type CrimeSeverity = 'petty' | 'moderate' | 'serious' | 'major';
+
+export interface CrimeDefinition {
+  id: string;
+  label: string;
+  severity: CrimeSeverity;
+  minAge: number;
+  baseSuccessChance: number;
+  successStatWeights: Partial<Record<'smarts' | 'looks', number>>;
+  rewardMin: number;
+  rewardMax: number;
+  sentenceYearsMin: number;
+  sentenceYearsMax: number;
+  arrestChanceOnFailure: number;
+}
+
 export interface Character {
   id: string;
   name: string;
