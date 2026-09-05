@@ -16,8 +16,21 @@ export type RelationshipEffect =
   | { type: 'breakup'; relation: 'partner' | 'spouse' }
   | { type: 'kill'; relation: Person['relation']; cause?: string };
 
+export type JobField =
+  | 'general'
+  | 'business'
+  | 'finance'
+  | 'tech'
+  | 'medicine'
+  | 'law'
+  | 'psychology'
+  | 'law_enforcement'
+  | 'entertainment'
+  | 'sports';
+
 export interface Job {
   id: string;
+  listingId: string; // links a live Job back to its JobListing
   title: string;
   salaryPerYear: number;
   level: number;
@@ -28,11 +41,20 @@ export interface Job {
 export interface JobListing {
   id: string;
   title: string;
+  field: JobField;
   minEducationLevel: EducationState['level'];
   minSmarts: number;
+  minTalent?: number;
+  minHealth?: number;
   minAge: number;
+  requiredMajors?: string[]; // MajorId[]; absent = open to anyone
   baseSalaryPerYear: number;
+  maxSalaryPerYear: number; // hard ceiling
   maxLevel: number;
+  promotionMultiplier?: number; // default 1.15
+  primaryStat?: 'smarts' | 'talent'; // drives hireChance's main bonus term, default 'smarts'
+  secondaryStat?: 'looks' | 'health'; // drives hireChance's secondary bonus term, default 'looks'
+  levelTitles?: string[]; // per-level display title, index [level-1]
 }
 
 export type JobEffect =
