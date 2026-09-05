@@ -2,6 +2,7 @@ import { nanoid } from 'nanoid';
 import type { Character, EducationEffect, HistoryEntry } from '@/lib/types';
 import { applyEffects } from '@/lib/engine/stats';
 import { chance, randInt } from '@/lib/rng';
+import { getMajorById } from '@/lib/data/majors';
 
 function entry(character: Character, text: string): HistoryEntry {
   return { id: nanoid(), age: character.age, text };
@@ -38,7 +39,8 @@ export function enroll(character: Character, level: 'university' | 'gradschool',
       money: character.money - UNIVERSITY_TUITION,
       education: { level: 'university', enrolled: true, dropoutFlag: false, currentGrade: 1, gpa: 2.5, major },
     };
-    return withHistory(next, `You enrolled in university${major ? ` to study ${major}` : ''}.`);
+    const majorLabel = major ? getMajorById(major)?.label ?? major : undefined;
+    return withHistory(next, `You enrolled in university${majorLabel ? ` to study ${majorLabel}` : ''}.`);
   }
 
   if (character.education.level !== 'university' || character.education.dropoutFlag) {
@@ -62,7 +64,8 @@ export function enroll(character: Character, level: 'university' | 'gradschool',
       major: major ?? character.education.major,
     },
   };
-  return withHistory(next, `You enrolled in grad school${major ? ` to study ${major}` : ''}.`);
+  const majorLabel = major ? getMajorById(major)?.label ?? major : undefined;
+  return withHistory(next, `You enrolled in grad school${majorLabel ? ` to study ${majorLabel}` : ''}.`);
 }
 
 export function dropOut(character: Character): Character {

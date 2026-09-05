@@ -4,6 +4,7 @@ import { useGameStore } from '@/lib/store';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { ProgressBar } from '@/components/ui/ProgressBar';
+import { MAJOR_CATALOG } from '@/lib/data/majors';
 
 const LEVEL_LABEL: Record<string, string> = {
   none: 'Not enrolled',
@@ -12,8 +13,6 @@ const LEVEL_LABEL: Record<string, string> = {
   university: 'University',
   gradschool: 'Grad School',
 };
-
-const MAJORS = ['Business', 'Engineering', 'Arts', 'Medicine', 'Law'];
 
 export default function EducationPage() {
   const activeId = useGameStore((state) => state.activeId);
@@ -63,9 +62,9 @@ export default function EducationPage() {
           <p className="font-semibold text-neutral-900 dark:text-white">Enroll in University</p>
           <p className="text-xs text-neutral-500 dark:text-neutral-400">Tuition: $200</p>
           <div className="flex flex-wrap gap-2">
-            {MAJORS.map((major) => (
-              <Button key={major} variant="secondary" onClick={() => enrollInSchool('university', major)}>
-                {major}
+            {MAJOR_CATALOG.map((major) => (
+              <Button key={major.id} variant="secondary" onClick={() => enrollInSchool('university', major.id)}>
+                {major.label}
               </Button>
             ))}
           </div>
@@ -77,9 +76,9 @@ export default function EducationPage() {
           <p className="font-semibold text-neutral-900 dark:text-white">Enroll in Grad School</p>
           <p className="text-xs text-neutral-500 dark:text-neutral-400">Tuition: $400</p>
           <div className="flex flex-wrap gap-2">
-            {MAJORS.map((major) => (
-              <Button key={major} variant="secondary" onClick={() => enrollInSchool('gradschool', major)}>
-                {major}
+            {MAJOR_CATALOG.map((major) => (
+              <Button key={major.id} variant="secondary" onClick={() => enrollInSchool('gradschool', major.id)}>
+                {major.label}
               </Button>
             ))}
           </div>
