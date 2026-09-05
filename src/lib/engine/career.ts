@@ -147,7 +147,13 @@ export function applyJobEffect(character: Character, effect: JobEffect): Charact
       const multiplier = listing?.promotionMultiplier ?? 1.15;
       const cap = listing?.maxSalaryPerYear ?? Infinity;
       const level = character.job.level + 1;
-      const salaryPerYear = Math.min(cap, Math.round(character.job.salaryPerYear * multiplier));
+      // Never let a promotion reduce pay: a pre-branch save can already sit
+      // above the listing's new maxSalaryPerYear cap (salary growth used to
+      // be uncapped), so Math.min alone would clamp salary downward on promo.
+      const salaryPerYear = Math.max(
+        character.job.salaryPerYear,
+        Math.min(cap, Math.round(character.job.salaryPerYear * multiplier))
+      );
       const title = listing?.levelTitles?.[level - 1] ?? character.job.title;
       const job: Job = { ...character.job, level, salaryPerYear, title };
       return { ...character, job };
@@ -187,7 +193,11 @@ export function applyCareerYearlyTick(character: Character): Character {
 
   if (job.performance >= 80 && job.level < maxLevel && chance(0.15)) {
     const level = job.level + 1;
-    const salaryPerYear = Math.min(salaryCap, Math.round(job.salaryPerYear * multiplier));
+    // See applyJobEffect's promote case: never let a promotion reduce pay.
+    const salaryPerYear = Math.max(
+      job.salaryPerYear,
+      Math.min(salaryCap, Math.round(job.salaryPerYear * multiplier))
+    );
     const title = listing?.levelTitles?.[level - 1] ?? job.title;
     const promoted: Job = { ...job, level, salaryPerYear, title };
     next = withHistory({ ...next, job: promoted }, `You were promoted to level ${promoted.level} at your job!`);

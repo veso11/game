@@ -386,6 +386,20 @@ describe('applyJobEffect', () => {
     expect(next.job?.salaryPerYear).toBe(18000);
   });
 
+  it('never lets a promotion reduce salary below its pre-promotion value on a pre-branch save above the cap (regression)', () => {
+    // Simulates a save from before salary caps existed: uncapped 10% raises
+    // compounded a fast_food_worker's salary to 25,000, well above the
+    // listing's new 18,000 maxSalaryPerYear. Math.min alone would clamp the
+    // promotion DOWN to 18,000 -- a pay cut disguised as a promotion.
+    const char = baseCharacter({
+      job: job({ listingId: 'fast_food_worker', title: 'Fast Food Worker', level: 1, salaryPerYear: 25000 }),
+    });
+    const next = applyJobEffect(char, { type: 'promote' });
+    expect(next.job?.level).toBe(2);
+    expect(next.job?.salaryPerYear).toBe(25000);
+    expect(next.job!.salaryPerYear).toBeGreaterThanOrEqual(25000);
+  });
+
   it('quit and fire both clear the job', () => {
     expect(applyJobEffect(baseCharacter({ job: job() }), { type: 'quit' }).job).toBeNull();
     expect(applyJobEffect(baseCharacter({ job: job() }), { type: 'fire' }).job).toBeNull();
@@ -439,6 +453,18 @@ describe('applyCareerYearlyTick', () => {
     const next = applyCareerYearlyTick(char);
     expect(next.job?.level).toBe(3);
     expect(next.history).toHaveLength(0);
+  });
+
+  it('never lets an auto-promotion reduce salary below its pre-promotion value on a pre-branch save above the cap (regression)', () => {
+    setRngSource(() => 0); // drift -5, chance(0.15) true -> auto-promotes
+    const char = baseCharacter({
+      job: job({ listingId: 'fast_food_worker', title: 'Fast Food Worker', level: 1, performance: 90, salaryPerYear: 25000 }),
+      history: [],
+    });
+    const next = applyCareerYearlyTick(char);
+    expect(next.job?.level).toBe(2);
+    expect(next.job?.salaryPerYear).toBeGreaterThanOrEqual(25000);
+    expect(next.job?.salaryPerYear).toBe(25000);
   });
 });
 
