@@ -134,6 +134,56 @@ describe('listAvailableJobs', () => {
       JOB_CATALOG.pop();
     }
   });
+
+  it('supports OR-list semantics for multi-major requirements (e.g. financial_analyst with finance OR business)', () => {
+    const charWithFinance = baseCharacter({
+      age: 25,
+      smarts: 60,
+      education: { level: 'university', enrolled: false, dropoutFlag: false, major: 'finance' },
+    });
+    expect(listAvailableJobs(charWithFinance).some((j) => j.id === 'financial_analyst')).toBe(true);
+
+    const charWithBusiness = baseCharacter({
+      age: 25,
+      smarts: 60,
+      education: { level: 'university', enrolled: false, dropoutFlag: false, major: 'business' },
+    });
+    expect(listAvailableJobs(charWithBusiness).some((j) => j.id === 'financial_analyst')).toBe(true);
+
+    const charWithWrongMajor = baseCharacter({
+      age: 25,
+      smarts: 60,
+      education: { level: 'university', enrolled: false, dropoutFlag: false, major: 'law' },
+    });
+    expect(listAvailableJobs(charWithWrongMajor).some((j) => j.id === 'financial_analyst')).toBe(false);
+  });
+
+  it('major-gates detective (criminal_justice required) while police_officer is open to any major', () => {
+    // police_officer is deliberately open (no requiredMajors)
+    const noMajor = baseCharacter({
+      age: 25,
+      smarts: 40,
+      education: { level: 'highschool', enrolled: false, dropoutFlag: false },
+    });
+    expect(listAvailableJobs(noMajor).some((j) => j.id === 'police_officer')).toBe(true);
+    expect(listAvailableJobs(noMajor).some((j) => j.id === 'detective')).toBe(false);
+
+    // detective requires criminal_justice
+    const withCriminalJustice = baseCharacter({
+      age: 30,
+      smarts: 60,
+      education: { level: 'university', enrolled: false, dropoutFlag: false, major: 'criminal_justice' },
+    });
+    expect(listAvailableJobs(withCriminalJustice).some((j) => j.id === 'detective')).toBe(true);
+
+    // detective excludes other majors
+    const withWrongMajor = baseCharacter({
+      age: 30,
+      smarts: 60,
+      education: { level: 'university', enrolled: false, dropoutFlag: false, major: 'psychology' },
+    });
+    expect(listAvailableJobs(withWrongMajor).some((j) => j.id === 'detective')).toBe(false);
+  });
 });
 
 describe('hireChance', () => {
