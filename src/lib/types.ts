@@ -1,4 +1,4 @@
-export type StatKey = 'health' | 'happiness' | 'smarts' | 'looks';
+export type StatKey = 'health' | 'happiness' | 'smarts' | 'looks' | 'talent';
 
 export interface Person {
   id: string;
@@ -101,6 +101,7 @@ export interface Character {
   happiness: number;
   smarts: number;
   looks: number;
+  talent: number;
   money: number;
 
   relationships: Person[];

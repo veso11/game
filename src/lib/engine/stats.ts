@@ -9,7 +9,7 @@ export type StatEffects = Partial<Record<StatKey | 'money', number>>;
 
 export function applyEffects(character: Character, effects: StatEffects): Character {
   const next: Character = { ...character };
-  (['health', 'happiness', 'smarts', 'looks'] as StatKey[]).forEach((key) => {
+  (['health', 'happiness', 'smarts', 'looks', 'talent'] as StatKey[]).forEach((key) => {
     if (effects[key] !== undefined) {
       next[key] = clampStat(character[key] + effects[key]!);
     }

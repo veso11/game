@@ -12,6 +12,7 @@ export function baseCharacter(overrides: Partial<Character> = {}): Character {
     happiness: 50,
     smarts: 50,
     looks: 50,
+    talent: 50,
     money: 100,
     relationships: [],
     job: null,

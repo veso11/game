@@ -35,4 +35,16 @@ describe('applyEffects', () => {
     const next = applyEffects(character, { smarts: 5 });
     expect(next.looks).toBe(40);
   });
+
+  it('clamps talent deltas just like the other four stats', () => {
+    const character = baseCharacter({ talent: 95 });
+    const next = applyEffects(character, { talent: 50 });
+    expect(next.talent).toBe(100);
+  });
+
+  it('clamps talent down to 0 when delta is negative enough', () => {
+    const character = baseCharacter({ talent: 30 });
+    const next = applyEffects(character, { talent: -50 });
+    expect(next.talent).toBe(0);
+  });
 });

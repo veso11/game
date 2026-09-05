@@ -35,6 +35,7 @@ function newCharacter(opts: { name?: string; country?: string }): Character {
     happiness: 80,
     smarts: 50,
     looks: 50,
+    talent: 50,
     money: 0,
     relationships: createInitialFamily(),
     job: null,
