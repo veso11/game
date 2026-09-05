@@ -18,6 +18,7 @@ import {
 } from '@/lib/engine/relationships';
 import { enroll as runEnroll, dropOut as runDropOut, study as runStudy } from '@/lib/engine/education';
 import { buyAsset as runBuyAsset, sellAsset as runSellAsset } from '@/lib/engine/assets';
+import { commitCrime as runCommitCrime } from '@/lib/engine/crime';
 import { getEventById } from '@/lib/data/events';
 import { randomName, randomCountry } from '@/lib/data/names';
 
@@ -75,6 +76,7 @@ interface GameState {
   buyAsset: (catalogId: string) => void;
   sellAsset: (assetId: string) => void;
   applyCasinoResult: (moneyDelta: number) => void;
+  commitCrime: (crimeId: string) => void;
 }
 
 export const useGameStore = create<GameState>()(
@@ -142,7 +144,7 @@ export const useGameStore = create<GameState>()(
         const { activeId, saves } = get();
         if (!activeId || !saves[activeId]) return;
         const current = saves[activeId].character;
-        if (!current.alive || current.pendingEventId) return;
+        if (!current.alive || current.pendingEventId || current.criminalRecord.inJail) return;
         const { character: nextCharacter } = runApplyForJob(current, listingId);
         set((state) => ({
           saves: {
@@ -170,7 +172,7 @@ export const useGameStore = create<GameState>()(
         const { activeId, saves } = get();
         if (!activeId || !saves[activeId]) return;
         const current = saves[activeId].character;
-        if (!current.alive || current.pendingEventId) return;
+        if (!current.alive || current.pendingEventId || current.criminalRecord.inJail) return;
         const nextCharacter = runRequestRaise(current);
         set((state) => ({
           saves: {
@@ -198,7 +200,7 @@ export const useGameStore = create<GameState>()(
         const { activeId, saves } = get();
         if (!activeId || !saves[activeId]) return;
         const current = saves[activeId].character;
-        if (!current.alive || current.pendingEventId) return;
+        if (!current.alive || current.pendingEventId || current.criminalRecord.inJail) return;
         const nextCharacter = runInteract(current, personId, kind);
         set((state) => ({
           saves: {
@@ -212,7 +214,7 @@ export const useGameStore = create<GameState>()(
         const { activeId, saves } = get();
         if (!activeId || !saves[activeId]) return;
         const current = saves[activeId].character;
-        if (!current.alive || current.pendingEventId) return;
+        if (!current.alive || current.pendingEventId || current.criminalRecord.inJail) return;
         const { character: nextCharacter } = runPropose(current, personId);
         set((state) => ({
           saves: {
@@ -226,7 +228,7 @@ export const useGameStore = create<GameState>()(
         const { activeId, saves } = get();
         if (!activeId || !saves[activeId]) return;
         const current = saves[activeId].character;
-        if (!current.alive || current.pendingEventId) return;
+        if (!current.alive || current.pendingEventId || current.criminalRecord.inJail) return;
         const nextCharacter = runBreakUp(current, personId);
         set((state) => ({
           saves: {
@@ -240,7 +242,7 @@ export const useGameStore = create<GameState>()(
         const { activeId, saves } = get();
         if (!activeId || !saves[activeId]) return;
         const current = saves[activeId].character;
-        if (!current.alive || current.pendingEventId) return;
+        if (!current.alive || current.pendingEventId || current.criminalRecord.inJail) return;
         const nextCharacter = runEnroll(current, level, major);
         set((state) => ({
           saves: {
@@ -268,7 +270,7 @@ export const useGameStore = create<GameState>()(
         const { activeId, saves } = get();
         if (!activeId || !saves[activeId]) return;
         const current = saves[activeId].character;
-        if (!current.alive || current.pendingEventId) return;
+        if (!current.alive || current.pendingEventId || current.criminalRecord.inJail) return;
         const nextCharacter = runStudy(current);
         set((state) => ({
           saves: {
@@ -282,7 +284,7 @@ export const useGameStore = create<GameState>()(
         const { activeId, saves } = get();
         if (!activeId || !saves[activeId]) return;
         const current = saves[activeId].character;
-        if (!current.alive || current.pendingEventId) return;
+        if (!current.alive || current.pendingEventId || current.criminalRecord.inJail) return;
         const { character: nextCharacter } = runBuyAsset(current, catalogId);
         set((state) => ({
           saves: {
@@ -310,7 +312,7 @@ export const useGameStore = create<GameState>()(
         const { activeId, saves } = get();
         if (!activeId || !saves[activeId]) return;
         const current = saves[activeId].character;
-        if (!current.alive || current.pendingEventId) return;
+        if (!current.alive || current.pendingEventId || current.criminalRecord.inJail) return;
         const text =
           moneyDelta > 0
             ? `You won $${moneyDelta.toLocaleString()} at blackjack.`
@@ -323,6 +325,20 @@ export const useGameStore = create<GameState>()(
           money: current.money + moneyDelta,
           history: [...current.history, entry],
         };
+        set((state) => ({
+          saves: {
+            ...state.saves,
+            [activeId]: { character: nextCharacter, lastPlayed: Date.now() },
+          },
+        }));
+      },
+
+      commitCrime: (crimeId: string) => {
+        const { activeId, saves } = get();
+        if (!activeId || !saves[activeId]) return;
+        const current = saves[activeId].character;
+        if (!current.alive || current.pendingEventId || current.criminalRecord.inJail) return;
+        const nextCharacter = runCommitCrime(current, crimeId);
         set((state) => ({
           saves: {
             ...state.saves,

@@ -18,6 +18,7 @@ const BASE_NAV_ITEMS: NavItem[] = [
 ];
 
 const CASINO_MIN_AGE = 18;
+const CRIME_MIN_AGE = 12;
 
 export function BottomNav() {
   const pathname = usePathname();
@@ -25,10 +26,15 @@ export function BottomNav() {
   const saves = useGameStore((state) => state.saves);
   const character = activeId ? saves[activeId]?.character : undefined;
 
-  const navItems =
-    character && character.age >= CASINO_MIN_AGE
-      ? [...BASE_NAV_ITEMS, { href: '/game/casino', label: 'Casino' }]
-      : BASE_NAV_ITEMS;
+  let navItems = BASE_NAV_ITEMS;
+  // Crime/Casino stay visible even while jailed, so the player can keep
+  // checking their sentence countdown on the Crime screen.
+  if (character && character.age >= CRIME_MIN_AGE) {
+    navItems = [...navItems, { href: '/game/crime', label: 'Crime' }];
+  }
+  if (character && character.age >= CASINO_MIN_AGE) {
+    navItems = [...navItems, { href: '/game/casino', label: 'Casino' }];
+  }
 
   return (
     <nav className="flex border-t border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800">
