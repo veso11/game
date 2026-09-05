@@ -38,9 +38,13 @@ export function ageUp(character: Character): Character {
   };
 
   // Baseline yearly drift so a life isn't static without event content yet.
+  // `talent` drifts unconditionally (unlike `smarts`, it isn't tied to
+  // schooling) so entertainment/sports minTalent gates aren't trivially
+  // satisfied forever by the fixed starting value.
   const drift = {
     health: randInt(-2, 1),
     happiness: randInt(-2, 2),
+    talent: randInt(-1, 2),
   };
   next = applyEffects(next, drift);
   next.history = [...next.history, entry(newAge, `You turned ${newAge}.`)];

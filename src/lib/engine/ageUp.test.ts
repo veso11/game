@@ -78,4 +78,25 @@ describe('ageUp', () => {
     expect(next.money).toBe(1800);
     expect(next.assets).toHaveLength(1);
   });
+
+  it('drifts talent by a small unconditional amount each year', () => {
+    setRngSource(() => 0.5); // randInt(-1, 2) resolves to 1
+    const char = baseCharacter({ age: 30, health: 90, talent: 50, job: null });
+    const next = ageUp(char);
+    expect(next.talent).toBe(51);
+  });
+
+  it('clamps talent drift at the 100 upper bound', () => {
+    setRngSource(() => 0.99); // randInt(-1, 2) resolves to 2
+    const char = baseCharacter({ age: 30, health: 90, talent: 99, job: null });
+    const next = ageUp(char);
+    expect(next.talent).toBe(100);
+  });
+
+  it('clamps talent drift at the 0 lower bound', () => {
+    setRngSource(() => 0); // randInt(-1, 2) resolves to -1
+    const char = baseCharacter({ age: 30, health: 90, talent: 0, job: null });
+    const next = ageUp(char);
+    expect(next.talent).toBe(0);
+  });
 });

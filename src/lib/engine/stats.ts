@@ -11,7 +11,9 @@ export function applyEffects(character: Character, effects: StatEffects): Charac
   const next: Character = { ...character };
   (['health', 'happiness', 'smarts', 'looks', 'talent'] as StatKey[]).forEach((key) => {
     if (effects[key] !== undefined) {
-      next[key] = clampStat(character[key] + effects[key]!);
+      // `?? 50` guards `talent`, which is `undefined` on pre-Phase-4 saves
+      // (it's harmless for the other four stats, which are always defined).
+      next[key] = clampStat((character[key] ?? 50) + effects[key]!);
     }
   });
   if (effects.money !== undefined) {

@@ -47,4 +47,10 @@ describe('applyEffects', () => {
     const next = applyEffects(character, { talent: -50 });
     expect(next.talent).toBe(0);
   });
+
+  it('treats an undefined talent (pre-Phase-4 save) as 50 before applying the delta, not NaN/0', () => {
+    const character = baseCharacter({ talent: undefined as unknown as number });
+    const next = applyEffects(character, { talent: 5 });
+    expect(next.talent).toBe(55);
+  });
 });
