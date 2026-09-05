@@ -19,6 +19,7 @@ const BASE_NAV_ITEMS: NavItem[] = [
 
 const CASINO_MIN_AGE = 18;
 const CRIME_MIN_AGE = 12;
+const INVESTING_MIN_AGE = 18;
 
 export function BottomNav() {
   const pathname = usePathname();
@@ -34,6 +35,9 @@ export function BottomNav() {
   }
   if (character && character.age >= CASINO_MIN_AGE) {
     navItems = [...navItems, { href: '/game/casino', label: 'Casino' }];
+  }
+  if (character && character.age >= INVESTING_MIN_AGE) {
+    navItems = [...navItems, { href: '/game/investing', label: 'Investing' }];
   }
 
   return (
