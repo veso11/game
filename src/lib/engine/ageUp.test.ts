@@ -5,7 +5,16 @@ import { setRngSource, resetRngSource } from '@/lib/rng';
 import type { AssetItem, Job } from '@/lib/types';
 
 function job(overrides: Partial<Job> = {}): Job {
-  return { id: 'j1', title: 'Test Job', salaryPerYear: 1000, level: 1, yearsInJob: 0, performance: 50, ...overrides };
+  return {
+    id: 'j1',
+    listingId: '',
+    title: 'Test Job',
+    salaryPerYear: 1000,
+    level: 1,
+    yearsInJob: 0,
+    performance: 50,
+    ...overrides,
+  };
 }
 
 function asset(overrides: Partial<AssetItem> = {}): AssetItem {

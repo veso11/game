@@ -54,7 +54,9 @@ describe('meetsRequirements', () => {
   });
 
   it('enforces hasJob', () => {
-    const employed = baseCharacter({ job: { id: 'j1', title: 'Clerk', salaryPerYear: 20, level: 1, yearsInJob: 1, performance: 50 } });
+    const employed = baseCharacter({
+      job: { id: 'j1', listingId: '', title: 'Clerk', salaryPerYear: 20, level: 1, yearsInJob: 1, performance: 50 },
+    });
     expect(meetsRequirements(employed, { hasJob: true })).toBe(true);
     expect(meetsRequirements(baseCharacter({ job: null }), { hasJob: true })).toBe(false);
   });

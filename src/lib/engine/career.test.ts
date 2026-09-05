@@ -7,13 +7,39 @@ import {
   requestRaise,
   applyJobEffect,
   applyCareerYearlyTick,
+  resolveJobListing,
 } from './career';
 import { baseCharacter } from '@/lib/testUtils';
 import { setRngSource, resetRngSource } from '@/lib/rng';
+import { JOB_CATALOG } from '@/lib/data/jobs';
 import type { Job, JobListing } from '@/lib/types';
 
 function job(overrides: Partial<Job> = {}): Job {
-  return { id: 'j1', title: 'Test Job', salaryPerYear: 1000, level: 1, yearsInJob: 0, performance: 50, ...overrides };
+  return {
+    id: 'j1',
+    listingId: '',
+    title: 'Test Job',
+    salaryPerYear: 1000,
+    level: 1,
+    yearsInJob: 0,
+    performance: 50,
+    ...overrides,
+  };
+}
+
+function jobListing(overrides: Partial<JobListing> = {}): JobListing {
+  return {
+    id: 'x',
+    title: 'X',
+    field: 'general',
+    minEducationLevel: 'none',
+    minSmarts: 20,
+    minAge: 0,
+    baseSalaryPerYear: 0,
+    maxSalaryPerYear: Infinity,
+    maxLevel: 5,
+    ...overrides,
+  };
 }
 
 afterEach(() => {
@@ -29,59 +55,126 @@ describe('listAvailableJobs', () => {
     expect(jobs.some((j) => j.id === 'software_engineer')).toBe(false);
   });
 
-  it('includes higher-tier jobs once education/smarts/age qualify', () => {
+  it('includes higher-tier jobs once education/smarts/age/major qualify', () => {
     const char = baseCharacter({
       age: 25,
       smarts: 70,
-      education: { level: 'university', enrolled: false, dropoutFlag: false },
+      education: { level: 'university', enrolled: false, dropoutFlag: false, major: 'computer_science' },
     });
     const jobs = listAvailableJobs(char);
     expect(jobs.some((j) => j.id === 'software_engineer')).toBe(true);
+  });
+
+  it('major-gates a real catalog listing (lawyer requires the law major)', () => {
+    const noMajor = baseCharacter({
+      age: 30,
+      smarts: 90,
+      education: { level: 'gradschool', enrolled: false, dropoutFlag: false },
+    });
+    expect(listAvailableJobs(noMajor).some((j) => j.id === 'lawyer')).toBe(false);
+
+    const wrongMajor = baseCharacter({
+      age: 30,
+      smarts: 90,
+      education: { level: 'gradschool', enrolled: false, dropoutFlag: false, major: 'medicine' },
+    });
+    expect(listAvailableJobs(wrongMajor).some((j) => j.id === 'lawyer')).toBe(false);
+
+    const lawMajor = baseCharacter({
+      age: 30,
+      smarts: 90,
+      education: { level: 'gradschool', enrolled: false, dropoutFlag: false, major: 'law' },
+    });
+    expect(listAvailableJobs(lawMajor).some((j) => j.id === 'lawyer')).toBe(true);
+  });
+
+  it('applies minTalent/minHealth/requiredMajors filtering for a listing carrying them', () => {
+    const talentListing = jobListing({
+      id: 'test_talent_job',
+      title: 'Test Talent Job',
+      minTalent: 60,
+      minHealth: 70,
+      minAge: 18,
+      requiredMajors: ['music'],
+    });
+    JOB_CATALOG.push(talentListing);
+    try {
+      const lowTalent = baseCharacter({
+        age: 20,
+        talent: 40,
+        health: 90,
+        education: { level: 'university', enrolled: false, dropoutFlag: false, major: 'music' },
+      });
+      expect(listAvailableJobs(lowTalent).some((j) => j.id === 'test_talent_job')).toBe(false);
+
+      const lowHealth = baseCharacter({
+        age: 20,
+        talent: 80,
+        health: 50,
+        education: { level: 'university', enrolled: false, dropoutFlag: false, major: 'music' },
+      });
+      expect(listAvailableJobs(lowHealth).some((j) => j.id === 'test_talent_job')).toBe(false);
+
+      const wrongMajor = baseCharacter({
+        age: 20,
+        talent: 80,
+        health: 90,
+        education: { level: 'university', enrolled: false, dropoutFlag: false, major: 'law' },
+      });
+      expect(listAvailableJobs(wrongMajor).some((j) => j.id === 'test_talent_job')).toBe(false);
+
+      const qualifies = baseCharacter({
+        age: 20,
+        talent: 80,
+        health: 90,
+        education: { level: 'university', enrolled: false, dropoutFlag: false, major: 'music' },
+      });
+      expect(listAvailableJobs(qualifies).some((j) => j.id === 'test_talent_job')).toBe(true);
+    } finally {
+      JOB_CATALOG.pop();
+    }
   });
 });
 
 describe('hireChance', () => {
   it('computes base plus smarts/looks adjustments', () => {
-    const listing: JobListing = {
-      id: 'x',
-      title: 'X',
-      minEducationLevel: 'none',
-      minSmarts: 20,
-      minAge: 0,
-      baseSalaryPerYear: 0,
-      maxLevel: 5,
-    };
+    const listing = jobListing({ minSmarts: 20 });
     const char = baseCharacter({ smarts: 40, looks: 50 });
     // base 0.5 + (40-20)*0.004 + 50*0.001 = 0.5 + 0.08 + 0.05 = 0.63
     expect(hireChance(char, listing)).toBeCloseTo(0.63);
   });
 
   it('clamps to a 0.1 floor for very unfavorable candidates', () => {
-    const listing: JobListing = {
-      id: 'x',
-      title: 'X',
-      minEducationLevel: 'none',
-      minSmarts: 1000,
-      minAge: 0,
-      baseSalaryPerYear: 0,
-      maxLevel: 5,
-    };
+    const listing = jobListing({ minSmarts: 1000 });
     const char = baseCharacter({ smarts: 0, looks: 0 });
     expect(hireChance(char, listing)).toBe(0.1);
   });
 
   it('clamps to a 0.95 ceiling for very favorable candidates', () => {
-    const listing: JobListing = {
-      id: 'x',
-      title: 'X',
-      minEducationLevel: 'none',
-      minSmarts: -1000,
-      minAge: 0,
-      baseSalaryPerYear: 0,
-      maxLevel: 5,
-    };
+    const listing = jobListing({ minSmarts: -1000 });
     const char = baseCharacter({ smarts: 100, looks: 100 });
     expect(hireChance(char, listing)).toBe(0.95);
+  });
+
+  it('uses talent as the primary stat when primaryStat is "talent"', () => {
+    const listing = jobListing({ primaryStat: 'talent', minTalent: 20, minSmarts: 999 });
+    const char = baseCharacter({ talent: 40, looks: 50, smarts: 0 });
+    // base 0.5 + (40-20)*0.004 + 50*0.001 = 0.63 (smarts/minSmarts ignored entirely)
+    expect(hireChance(char, listing)).toBeCloseTo(0.63);
+  });
+
+  it('defaults talent to 50 when character.talent is undefined (old-save backward compat)', () => {
+    const listing = jobListing({ primaryStat: 'talent', minTalent: 20, minSmarts: 999 });
+    const char = baseCharacter({ looks: 0, talent: undefined });
+    // base 0.5 + (50-20)*0.004 + 0*0.001 = 0.62
+    expect(hireChance(char, listing)).toBeCloseTo(0.62);
+  });
+
+  it('uses health as the secondary stat when secondaryStat is "health"', () => {
+    const listing = jobListing({ secondaryStat: 'health', minSmarts: 20 });
+    const char = baseCharacter({ smarts: 40, looks: 999, health: 50 });
+    // base 0.5 + (40-20)*0.004 + 50*0.001 = 0.63 (looks ignored entirely)
+    expect(hireChance(char, listing)).toBeCloseTo(0.63);
   });
 });
 
@@ -109,6 +202,13 @@ describe('applyForJob', () => {
     const { character: next, success } = applyForJob(char, 'nonexistent');
     expect(success).toBe(false);
     expect(next).toBe(char);
+  });
+
+  it('sets job.listingId to the applied listing id', () => {
+    setRngSource(() => 0);
+    const char = baseCharacter();
+    const { character: next } = applyForJob(char, 'fast_food_worker');
+    expect(next.job?.listingId).toBe('fast_food_worker');
   });
 });
 
@@ -146,6 +246,31 @@ describe('requestRaise', () => {
     const char = baseCharacter({ job: null });
     expect(requestRaise(char)).toBe(char);
   });
+
+  it('no-ops at the salary cap without rolling RNG', () => {
+    let rngCalls = 0;
+    setRngSource(() => {
+      rngCalls += 1;
+      return 0;
+    });
+    const char = baseCharacter({
+      job: job({ listingId: 'fast_food_worker', salaryPerYear: 18000, performance: 90 }),
+    });
+    const next = requestRaise(char);
+    expect(next.job?.salaryPerYear).toBe(18000);
+    expect(next.history.at(-1)?.text).toContain('top of your pay scale');
+    expect(rngCalls).toBe(0);
+  });
+
+  it('clamps a raise to the listing salary cap instead of exceeding it', () => {
+    setRngSource(() => 0);
+    const char = baseCharacter({
+      job: job({ listingId: 'fast_food_worker', salaryPerYear: 17000, performance: 90 }),
+    });
+    const next = requestRaise(char);
+    // 17000 * 1.1 = 18700, clamped to fast_food_worker's maxSalaryPerYear of 18000
+    expect(next.job?.salaryPerYear).toBe(18000);
+  });
 });
 
 describe('applyJobEffect', () => {
@@ -166,6 +291,49 @@ describe('applyJobEffect', () => {
     const next = applyJobEffect(char, { type: 'promote' });
     expect(next.job?.level).toBe(2);
     expect(next.job?.salaryPerYear).toBe(1150);
+  });
+
+  it('does not promote past a listing maxLevel below the old hardcoded cap of 5 (regression)', () => {
+    // fast_food_worker's catalog maxLevel is 3; before this fix, applyJobEffect
+    // hardcoded `level >= 5` and would have allowed a level-3 fast food worker to
+    // keep getting promoted all the way to 5.
+    const char = baseCharacter({
+      job: job({ listingId: 'fast_food_worker', title: 'Fast Food Worker', level: 3, salaryPerYear: 15000 }),
+    });
+    const next = applyJobEffect(char, { type: 'promote' });
+    expect(next).toBe(char);
+    expect(next.job?.level).toBe(3);
+  });
+
+  it('uses the listing promotionMultiplier and levelTitles when promoting', () => {
+    const promoListing = jobListing({
+      id: 'test_promo_job',
+      title: 'Test Promo Job',
+      maxLevel: 5,
+      promotionMultiplier: 2,
+      levelTitles: ['Junior Promo', 'Senior Promo'],
+    });
+    JOB_CATALOG.push(promoListing);
+    try {
+      const char = baseCharacter({
+        job: job({ listingId: 'test_promo_job', level: 1, salaryPerYear: 1000, title: 'Junior Promo' }),
+      });
+      const next = applyJobEffect(char, { type: 'promote' });
+      expect(next.job?.level).toBe(2);
+      expect(next.job?.salaryPerYear).toBe(2000);
+      expect(next.job?.title).toBe('Senior Promo');
+    } finally {
+      JOB_CATALOG.pop();
+    }
+  });
+
+  it('clamps a promotion salary bump to the listing maxSalaryPerYear', () => {
+    const char = baseCharacter({
+      job: job({ listingId: 'fast_food_worker', title: 'Fast Food Worker', level: 2, salaryPerYear: 17000 }),
+    });
+    const next = applyJobEffect(char, { type: 'promote' });
+    // 17000 * 1.15 = 19550, clamped to fast_food_worker's maxSalaryPerYear of 18000
+    expect(next.job?.salaryPerYear).toBe(18000);
   });
 
   it('quit and fire both clear the job', () => {
@@ -210,5 +378,46 @@ describe('applyCareerYearlyTick', () => {
     expect(next.job).toBeNull();
     expect(next.happiness).toBe(40);
     expect(next.history.at(-1)?.text).toContain('let go');
+  });
+
+  it('does not auto-promote past a listing maxLevel below the old hardcoded cap of 5', () => {
+    setRngSource(() => 0); // would drift -5 and roll chance(0.15) true if not blocked by the level gate
+    const char = baseCharacter({
+      job: job({ listingId: 'fast_food_worker', title: 'Fast Food Worker', level: 3, performance: 90 }),
+      history: [],
+    });
+    const next = applyCareerYearlyTick(char);
+    expect(next.job?.level).toBe(3);
+    expect(next.history).toHaveLength(0);
+  });
+});
+
+describe('resolveJobListing', () => {
+  it('resolves via job.listingId when present', () => {
+    const j = job({ listingId: 'fast_food_worker', title: 'Fast Food Worker' });
+    expect(resolveJobListing(j)?.id).toBe('fast_food_worker');
+  });
+
+  it('falls back to matching by title for a legacy Job with no listingId', () => {
+    // Simulates a pre-Task-3 save, whose stored Job predates the listingId field.
+    const legacy = {
+      id: 'old1',
+      title: 'Fast Food Worker',
+      salaryPerYear: 12000,
+      level: 1,
+      yearsInJob: 0,
+      performance: 50,
+    } as unknown as Job;
+    expect(resolveJobListing(legacy)?.id).toBe('fast_food_worker');
+  });
+
+  it('returns undefined when neither listingId nor title match any catalog entry', () => {
+    const j = job({ listingId: 'nonexistent', title: 'Nonexistent Job' });
+    expect(resolveJobListing(j)).toBeUndefined();
+  });
+
+  it('returns undefined for a null/undefined job', () => {
+    expect(resolveJobListing(null)).toBeUndefined();
+    expect(resolveJobListing(undefined)).toBeUndefined();
   });
 });
