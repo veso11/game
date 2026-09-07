@@ -78,8 +78,7 @@ export function pickEvent(
 }
 
 /**
- * Rolls 1-3 events for a single age-up: always one, ~40% chance of a
- * second, and if a second happened, ~10% chance of a third.
+ * Rolls 1-2 events for a single age-up: always one, ~40% chance of a second.
  */
 export function pickEventsForYear(character: Character, pool: LifeEvent[]): LifeEvent[] {
   const picked: LifeEvent[] = [];
@@ -92,15 +91,7 @@ export function pickEventsForYear(character: Character, pool: LifeEvent[]): Life
 
   if (chance(0.4)) {
     const second = pickEvent(character, pool, excludeIds);
-    if (second) {
-      picked.push(second);
-      excludeIds.add(second.id);
-
-      if (chance(0.1)) {
-        const third = pickEvent(character, pool, excludeIds);
-        if (third) picked.push(third);
-      }
-    }
+    if (second) picked.push(second);
   }
 
   return picked;
