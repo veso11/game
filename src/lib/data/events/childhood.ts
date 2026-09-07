@@ -55,8 +55,18 @@ export const CHILDHOOD_EVENTS: LifeEvent[] = [
     once: true,
     text: 'Your parents asked if you want a pet.',
     choices: [
-      { label: 'Get a dog', effects: { happiness: 8, money: -20 }, resultText: 'You named it Buddy and you\'re inseparable.' },
-      { label: 'Get a fish', effects: { happiness: 3, money: -5 }, resultText: 'It mostly just swims in circles, but it\'s yours.' },
+      {
+        label: 'Get a dog',
+        effects: { happiness: 8, money: -20 },
+        assetEffect: { type: 'buy', catalogId: 'pet_dog' },
+        resultText: 'You named it Buddy and you\'re inseparable.',
+      },
+      {
+        label: 'Get a fish',
+        effects: { happiness: 3, money: -5 },
+        assetEffect: { type: 'buy', catalogId: 'pet_fish' },
+        resultText: 'It mostly just swims in circles, but it\'s yours.',
+      },
       { label: 'No pets, thanks', effects: {}, resultText: 'You decided pets are too much responsibility.' },
     ],
   },
@@ -159,6 +169,39 @@ export const CHILDHOOD_EVENTS: LifeEvent[] = [
     text: 'You caught chickenpox.',
     choices: [
       { label: 'Rest it out', effects: { health: -8, happiness: -3 }, resultText: 'It was itchy and miserable, but you recovered.' },
+    ],
+  },
+  {
+    id: 'child_new_friend',
+    minAge: 6,
+    maxAge: 10,
+    weight: 8,
+    once: true,
+    text: 'You met someone new at school who seems fun to hang out with.',
+    choices: [
+      {
+        label: 'Become friends',
+        effects: { happiness: 5 },
+        relationshipEffect: { type: 'addPerson', relation: 'friend', startingMeter: 60 },
+        resultText: 'You two were inseparable at recess from then on.',
+      },
+      { label: 'Keep to yourself', effects: {}, resultText: 'Maybe next time.' },
+    ],
+  },
+  {
+    id: 'child_family_dinner',
+    minAge: 5,
+    maxAge: 12,
+    weight: 7,
+    text: 'Your family had a big dinner together tonight.',
+    choices: [
+      {
+        label: 'Share about your day',
+        effects: { happiness: 3 },
+        relationshipEffect: { type: 'modifyMeter', relation: 'parent', delta: 8 },
+        resultText: 'Your parents loved hearing all about it.',
+      },
+      { label: 'Eat quietly', effects: {}, resultText: 'You were more interested in the food than conversation.' },
     ],
   },
   {

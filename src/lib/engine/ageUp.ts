@@ -1,6 +1,12 @@
 import type { Character, HistoryEntry } from '@/lib/types';
 import { applyEffects } from '@/lib/engine/stats';
 import { pickEventsForYear } from '@/lib/engine/events';
+import { applyCareerYearlyTick } from '@/lib/engine/career';
+import { applyRelationshipYearlyTick } from '@/lib/engine/relationships';
+import { applyEducationYearlyTick } from '@/lib/engine/education';
+import { applyAssetYearlyTick } from '@/lib/engine/assets';
+import { applyCrimeYearlyTick } from '@/lib/engine/crime';
+import { applyMarketYearlyTick } from '@/lib/market/engine';
 import { ALL_EVENTS } from '@/lib/data/events';
 import { randInt, chance } from '@/lib/rng';
 import { nanoid } from 'nanoid';
@@ -32,12 +38,23 @@ export function ageUp(character: Character): Character {
   };
 
   // Baseline yearly drift so a life isn't static without event content yet.
+  // `talent` drifts unconditionally (unlike `smarts`, it isn't tied to
+  // schooling) so entertainment/sports minTalent gates aren't trivially
+  // satisfied forever by the fixed starting value.
   const drift = {
     health: randInt(-2, 1),
     happiness: randInt(-2, 2),
+    talent: randInt(-1, 2),
   };
   next = applyEffects(next, drift);
   next.history = [...next.history, entry(newAge, `You turned ${newAge}.`)];
+
+  next = applyEducationYearlyTick(next);
+  next = applyCareerYearlyTick(next);
+  next = applyRelationshipYearlyTick(next);
+  next = applyAssetYearlyTick(next);
+  next = applyCrimeYearlyTick(next);
+  next = applyMarketYearlyTick(next);
 
   if (rollDeath(newAge, next.health)) {
     next.alive = false;

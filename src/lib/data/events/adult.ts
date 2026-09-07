@@ -9,7 +9,12 @@ export const ADULT_EVENTS: LifeEvent[] = [
     requires: { hasJob: false },
     text: 'You spotted an interesting job listing.',
     choices: [
-      { label: 'Apply', effects: { happiness: 3, money: 10 }, resultText: 'You landed an interview and eventually the job.' },
+      {
+        label: 'Apply',
+        effects: { happiness: 3 },
+        jobEffect: { type: 'grantJob', listingId: 'retail_associate' },
+        resultText: 'You landed an interview and eventually the job.',
+      },
       { label: 'Ignore it', effects: {}, resultText: 'Not the right fit, you figured.' },
     ],
   },
@@ -21,7 +26,12 @@ export const ADULT_EVENTS: LifeEvent[] = [
     requires: { hasJob: true },
     text: 'Your boss mentioned an opportunity for extra responsibility.',
     choices: [
-      { label: 'Take it on', effects: { money: 20, happiness: -2, smarts: 2 }, resultText: 'The extra work paid off, literally.' },
+      {
+        label: 'Take it on',
+        effects: { happiness: -2, smarts: 2 },
+        jobEffect: { type: 'promote' },
+        resultText: 'The extra work paid off, literally.',
+      },
       { label: 'Stick to your role', effects: { happiness: 2 }, resultText: 'You kept your work-life balance intact.' },
     ],
   },
@@ -30,7 +40,7 @@ export const ADULT_EVENTS: LifeEvent[] = [
     minAge: 20,
     maxAge: 70,
     weight: 8,
-    requires: { minMoney: 0 },
+    requires: { minMoney: 0, hasAssetType: 'car' },
     text: 'Your car broke down unexpectedly.',
     choices: [
       { label: 'Pay for repairs', effects: { money: -40, happiness: -1 }, resultText: 'It cost a chunk of change, but it\'s fixed.' },
@@ -163,6 +173,74 @@ export const ADULT_EVENTS: LifeEvent[] = [
       { label: 'Learn an instrument', effects: { happiness: 4, smarts: 2, money: -15 }, resultText: 'Music became your favorite way to unwind.' },
       { label: 'Start painting', effects: { happiness: 4, looks: 1 }, resultText: 'You discovered a hidden creative streak.' },
       { label: 'Not right now', effects: {}, resultText: 'Maybe another time.' },
+    ],
+  },
+  {
+    id: 'adult_parent_hospital',
+    minAge: 30,
+    maxAge: 70,
+    weight: 5,
+    text: 'One of your parents was hospitalized for a health scare.',
+    choices: [
+      {
+        label: 'Visit and support them',
+        effects: { happiness: -2, money: -20 },
+        relationshipEffect: { type: 'modifyMeter', relation: 'parent', delta: 15 },
+        resultText: 'You spent every evening at the hospital until they recovered.',
+      },
+      {
+        label: "You're too busy to visit",
+        effects: {},
+        relationshipEffect: { type: 'modifyMeter', relation: 'parent', delta: -15 },
+        resultText: 'They recovered, but they noticed you weren\'t there.',
+      },
+    ],
+  },
+  {
+    id: 'adult_makes_new_friend',
+    minAge: 22,
+    maxAge: 45,
+    weight: 6,
+    once: true,
+    text: 'You hit it off with a coworker outside of the office.',
+    choices: [
+      {
+        label: 'Grab a coffee together',
+        effects: { happiness: 4 },
+        relationshipEffect: { type: 'addPerson', relation: 'friend', startingMeter: 55 },
+        resultText: 'You became genuine friends.',
+      },
+      { label: 'Keep it strictly professional', effects: {}, resultText: 'You kept things at work, at work.' },
+    ],
+  },
+  {
+    id: 'adult_grow_closer',
+    minAge: 22,
+    maxAge: 65,
+    weight: 6,
+    requires: { relationshipStatus: ['partnered'] },
+    text: 'You and your partner have been spending a lot of quality time together lately.',
+    choices: [
+      {
+        label: 'Plan a special evening',
+        effects: { happiness: 4, money: -20 },
+        relationshipEffect: { type: 'modifyMeter', relation: 'partner', delta: 15 },
+        resultText: 'It brought you even closer together.',
+      },
+      { label: 'Keep things low-key', effects: { happiness: 1 }, resultText: 'A quiet night in was just as nice.' },
+    ],
+  },
+  {
+    id: 'adult_continuing_education',
+    minAge: 24,
+    maxAge: 45,
+    weight: 4,
+    once: true,
+    requires: { minStats: { smarts: 55 }, educationLevel: ['highschool'] },
+    text: 'You\'ve been considering going back to school to further your career.',
+    choices: [
+      { label: 'Look into programs', effects: { smarts: 2, happiness: 2 }, resultText: 'You started researching your options seriously.' },
+      { label: 'Not right now', effects: {}, resultText: 'Maybe when things settle down.' },
     ],
   },
   {

@@ -10,7 +10,12 @@ export const TEEN_EVENTS: LifeEvent[] = [
     requires: { hasJob: false },
     text: 'A local shop is hiring for a part-time gig.',
     choices: [
-      { label: 'Take the job', effects: { money: 30, happiness: -1 }, resultText: 'You worked weekends and saved up some cash.' },
+      {
+        label: 'Take the job',
+        effects: { happiness: -1 },
+        jobEffect: { type: 'grantJob', listingId: 'fast_food_worker' },
+        resultText: 'You worked weekends and saved up some cash.',
+      },
       { label: 'Focus on school instead', effects: { smarts: 3 }, resultText: 'You spent the extra time studying.' },
     ],
   },
@@ -127,6 +132,66 @@ export const TEEN_EVENTS: LifeEvent[] = [
     choices: [
       { label: 'Apologize and explain', effects: { happiness: -1 }, resultText: 'Your parents were annoyed but understanding.' },
       { label: 'Sneak in quietly', effects: { happiness: 1, smarts: -1 }, resultText: 'You got away with it... this time.' },
+    ],
+  },
+  {
+    id: 'teen_started_dating',
+    minAge: 15,
+    maxAge: 18,
+    weight: 8,
+    once: true,
+    requires: { relationshipStatus: ['single'] },
+    text: 'Someone from school asked you out.',
+    choices: [
+      {
+        label: 'Say yes',
+        effects: { happiness: 8 },
+        relationshipEffect: { type: 'addPerson', relation: 'partner', startingMeter: 60 },
+        resultText: 'You two started dating.',
+      },
+      { label: 'Say no', effects: {}, resultText: 'You weren\'t interested right now.' },
+    ],
+  },
+  {
+    id: 'teen_family_tension',
+    minAge: 13,
+    maxAge: 18,
+    weight: 7,
+    text: 'You had an argument with your parents about your curfew.',
+    choices: [
+      {
+        label: 'Apologize and talk it out',
+        effects: { happiness: 1 },
+        relationshipEffect: { type: 'modifyMeter', relation: 'parent', delta: 6 },
+        resultText: 'You worked things out together.',
+      },
+      {
+        label: 'Slam the door and storm off',
+        effects: { happiness: 2 },
+        relationshipEffect: { type: 'modifyMeter', relation: 'parent', delta: -10 },
+        resultText: 'It felt good in the moment, but things were tense for a while.',
+      },
+    ],
+  },
+  {
+    id: 'teen_exam_stress',
+    minAge: 15,
+    maxAge: 18,
+    weight: 8,
+    text: 'Finals are coming up and you\'re feeling the pressure.',
+    choices: [
+      {
+        label: 'Cram all night',
+        effects: { smarts: 3, happiness: -3 },
+        educationEffect: { type: 'gpaDelta', delta: 0.3 },
+        resultText: 'It paid off — your grades held up.',
+      },
+      {
+        label: 'Wing it',
+        effects: { smarts: -1, happiness: 2 },
+        educationEffect: { type: 'gpaDelta', delta: -0.2 },
+        resultText: 'You took the risk and your grades slipped a bit.',
+      },
     ],
   },
   {

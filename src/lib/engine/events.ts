@@ -1,6 +1,10 @@
 import type { Character, EventRequirements, HistoryEntry, LifeEvent, RelationshipStatus } from '@/lib/types';
 import { pickWeighted, chance } from '@/lib/rng';
 import { applyEffects } from '@/lib/engine/stats';
+import { applyJobEffect } from '@/lib/engine/career';
+import { applyRelationshipEffect } from '@/lib/engine/relationships';
+import { applyEducationEffect } from '@/lib/engine/education';
+import { applyAssetEffect } from '@/lib/engine/assets';
 import { nanoid } from 'nanoid';
 
 export function relationshipStatus(character: Character): RelationshipStatus {
@@ -33,6 +37,17 @@ export function meetsRequirements(character: Character, requires?: EventRequirem
   }
   if (requires.minMoney !== undefined && character.money < requires.minMoney) {
     return false;
+  }
+  if (requires.maxMoney !== undefined && character.money > requires.maxMoney) {
+    return false;
+  }
+  if (requires.hasAssetType && !character.assets.some((a) => a.type === requires.hasAssetType)) {
+    return false;
+  }
+  if (requires.minRelationshipMeter) {
+    const { relation, min } = requires.minRelationshipMeter;
+    const person = character.relationships.find((p) => p.alive && p.relation === relation);
+    if (!person || person.relationshipMeter < min) return false;
   }
   return true;
 }
@@ -100,6 +115,10 @@ export function resolveEvent(
   if (!choice) return character;
 
   let next = applyEffects(character, choice.effects);
+  if (choice.jobEffect) next = applyJobEffect(next, choice.jobEffect);
+  if (choice.relationshipEffect) next = applyRelationshipEffect(next, choice.relationshipEffect);
+  if (choice.educationEffect) next = applyEducationEffect(next, choice.educationEffect);
+  if (choice.assetEffect) next = applyAssetEffect(next, choice.assetEffect);
 
   const entry: HistoryEntry = {
     id: nanoid(),
