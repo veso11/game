@@ -13,7 +13,7 @@ export function SaveSlotList() {
   const entries = Object.values(saves).sort((a, b) => b.lastPlayed - a.lastPlayed);
 
   if (entries.length === 0) {
-    return <p className="text-sm text-neutral-500 dark:text-neutral-400">No saved lives yet.</p>;
+    return <p className="text-sm text-ink-muted">No saved lives yet.</p>;
   }
 
   return (
@@ -21,11 +21,11 @@ export function SaveSlotList() {
       {entries.map(({ character }) => (
         <div
           key={character.id}
-          className="flex items-center justify-between rounded-lg border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 px-3 py-2"
+          className="flex items-center justify-between rounded-lg border border-border bg-surface px-3 py-2"
         >
-          <div className="text-sm text-neutral-800 dark:text-neutral-100">
+          <div className="text-sm text-ink">
             <div className="font-medium">{character.name}</div>
-            <div className="text-xs text-neutral-500 dark:text-neutral-400">
+            <div className="text-xs text-ink-muted">
               Age {character.age} · {character.alive ? 'Alive' : 'Deceased'}
             </div>
           </div>

@@ -24,12 +24,12 @@ export function NewLifeForm() {
         placeholder="Name (leave blank for random)"
         value={name}
         onChange={(e) => setName(e.target.value)}
-        className="rounded-lg border border-neutral-300 dark:border-neutral-600 bg-white dark:bg-neutral-800 px-3 py-2 text-sm text-neutral-900 dark:text-white"
+        className="rounded-lg border border-border bg-surface px-3 py-2 text-sm text-ink"
       />
       <select
         value={country}
         onChange={(e) => setCountry(e.target.value)}
-        className="rounded-lg border border-neutral-300 dark:border-neutral-600 bg-white dark:bg-neutral-800 px-3 py-2 text-sm text-neutral-900 dark:text-white"
+        className="rounded-lg border border-border bg-surface px-3 py-2 text-sm text-ink"
       >
         {COUNTRIES.map((c) => (
           <option key={c} value={c}>

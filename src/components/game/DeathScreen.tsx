@@ -7,14 +7,14 @@ import { useRouter } from 'next/navigation';
 export function DeathScreen({ character }: { character: Character }) {
   const router = useRouter();
   return (
-    <div className="flex flex-1 flex-col items-center justify-center gap-4 px-6 text-center bg-neutral-50 dark:bg-neutral-900">
-      <h1 className="text-2xl font-bold text-neutral-800 dark:text-neutral-100">In Memoriam</h1>
-      <p className="text-neutral-600 dark:text-neutral-300">
+    <div className="flex flex-1 flex-col items-center justify-center gap-4 px-6 text-center bg-bg">
+      <h1 className="text-2xl font-bold text-ink">In Memoriam</h1>
+      <p className="text-ink-muted">
         {character.name}, age {character.age}
         <br />
         Cause of death: {character.causeOfDeath ?? 'Unknown'}
       </p>
-      <div className="text-sm text-neutral-500 dark:text-neutral-400 max-w-sm">
+      <div className="text-sm text-ink-muted max-w-sm">
         Final stats — Health {character.health}, Happiness {character.happiness}, Smarts{' '}
         {character.smarts}, Looks {character.looks}, Money ${character.money.toLocaleString()}
       </div>

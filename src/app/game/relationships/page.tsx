@@ -24,7 +24,7 @@ export default function RelationshipsPage() {
       </Button>
 
       {character.relationships.length === 0 && (
-        <p className="text-sm text-neutral-400 dark:text-neutral-500">No relationships yet.</p>
+        <p className="text-sm text-ink-muted">No relationships yet.</p>
       )}
 
       {character.relationships.map((person) => (

@@ -8,8 +8,8 @@ export function JobCard({ listing, onApply }: { listing: JobListing; onApply: (l
   return (
     <Card className="flex items-center justify-between gap-3">
       <div>
-        <p className="font-semibold text-neutral-900 dark:text-white">{listing.title}</p>
-        <p className="text-xs text-neutral-500 dark:text-neutral-400">
+        <p className="font-semibold text-ink">{listing.title}</p>
+        <p className="text-xs text-ink-muted">
           ${listing.baseSalaryPerYear.toLocaleString()}/yr · min age {listing.minAge}
         </p>
       </div>

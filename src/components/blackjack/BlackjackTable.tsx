@@ -64,23 +64,23 @@ export function BlackjackTable({ money, onSettle }: { money: number; onSettle: (
   return (
     <div className="space-y-4">
       <Card className="space-y-2">
-        <p className="text-xs font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wide">Dealer</p>
-        <p className="text-lg text-neutral-900 dark:text-white">
+        <p className="text-xs font-semibold text-ink-muted uppercase tracking-wide">Dealer</p>
+        <p className="text-lg text-ink">
           {state.dealerHand.length > 0 ? state.dealerHand.map(cardLabel).join(' ') : '—'}
           {state.phase === 'settled' && state.dealerHand.length > 0 && ` (${handValue(state.dealerHand)})`}
         </p>
       </Card>
 
       <Card className="space-y-2">
-        <p className="text-xs font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wide">You</p>
-        <p className="text-lg text-neutral-900 dark:text-white">
+        <p className="text-xs font-semibold text-ink-muted uppercase tracking-wide">You</p>
+        <p className="text-lg text-ink">
           {state.playerHand.length > 0 ? state.playerHand.map(cardLabel).join(' ') : '—'}
           {state.playerHand.length > 0 && ` (${handValue(state.playerHand)})`}
         </p>
       </Card>
 
       {state.phase === 'settled' && state.outcome && (
-        <p className="text-center font-semibold text-neutral-900 dark:text-white">{OUTCOME_LABEL[state.outcome]}</p>
+        <p className="text-center font-semibold text-ink">{OUTCOME_LABEL[state.outcome]}</p>
       )}
 
       {inBettingPhase ? (
@@ -92,7 +92,7 @@ export function BlackjackTable({ money, onSettle }: { money: number; onSettle: (
             value={betInput}
             onChange={(e) => setBetInput(Math.max(1, Math.min(Math.max(1, maxBet), Number(e.target.value) || 1)))}
             disabled={!canPlay}
-            className="w-24 rounded-lg border border-neutral-300 dark:border-neutral-600 bg-white dark:bg-neutral-800 px-2 py-1 text-sm text-neutral-900 dark:text-white disabled:opacity-40"
+            className="w-24 rounded-lg border border-border bg-surface px-2 py-1 text-sm text-ink disabled:opacity-40"
           />
           <Button onClick={handleDeal} disabled={!canPlay}>
             Deal
@@ -109,7 +109,7 @@ export function BlackjackTable({ money, onSettle }: { money: number; onSettle: (
         </div>
       )}
 
-      {!canPlay && <p className="text-sm text-neutral-400 dark:text-neutral-500">You need at least $1 to play.</p>}
+      {!canPlay && <p className="text-sm text-ink-muted">You need at least $1 to play.</p>}
     </div>
   );
 }

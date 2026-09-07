@@ -20,17 +20,17 @@ export default function AssetsPage() {
   return (
     <div className="flex-1 overflow-y-auto px-4 py-3 space-y-4">
       <div className="space-y-2">
-        <h2 className="text-sm font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wide">
+        <h2 className="text-sm font-semibold text-ink-muted uppercase tracking-wide">
           Your Assets
         </h2>
         {character.assets.length === 0 && (
-          <p className="text-sm text-neutral-400 dark:text-neutral-500">You don&apos;t own anything yet.</p>
+          <p className="text-sm text-ink-muted">You don&apos;t own anything yet.</p>
         )}
         {character.assets.map((asset) => (
           <Card key={asset.id} className="flex items-center justify-between gap-3">
             <div>
-              <p className="font-semibold text-neutral-900 dark:text-white">{asset.name}</p>
-              <p className="text-xs text-neutral-500 dark:text-neutral-400">Worth ${asset.value.toLocaleString()}</p>
+              <p className="font-semibold text-ink">{asset.name}</p>
+              <p className="text-xs text-ink-muted">Worth ${asset.value.toLocaleString()}</p>
             </div>
             <Button variant="danger" onClick={() => sellAsset(asset.id)}>
               Sell
@@ -40,14 +40,14 @@ export default function AssetsPage() {
       </div>
 
       <div className="space-y-2">
-        <h2 className="text-sm font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wide">Shop</h2>
+        <h2 className="text-sm font-semibold text-ink-muted uppercase tracking-wide">Shop</h2>
         {shopEntries.map((entry) => {
           const affordable = character.money >= entry.cost;
           return (
             <Card key={entry.id} className="flex items-center justify-between gap-3">
               <div>
-                <p className="font-semibold text-neutral-900 dark:text-white">{entry.name}</p>
-                <p className="text-xs text-neutral-500 dark:text-neutral-400">
+                <p className="font-semibold text-ink">{entry.name}</p>
+                <p className="text-xs text-ink-muted">
                   ${entry.cost.toLocaleString()} · ${entry.upkeepPerYear.toLocaleString()}/yr upkeep
                 </p>
               </div>

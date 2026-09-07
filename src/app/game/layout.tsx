@@ -1,11 +1,13 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, type CSSProperties } from 'react';
+import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useGameStore } from '@/lib/store';
 import { StatPanel } from '@/components/game/StatPanel';
 import { BottomNav } from '@/components/game/BottomNav';
 import { DeathScreen } from '@/components/game/DeathScreen';
+import { getStageAccent } from '@/lib/lifeStage';
 
 export default function GameLayout({ children }: LayoutProps<'/game'>) {
   const router = useRouter();
@@ -37,17 +39,36 @@ export default function GameLayout({ children }: LayoutProps<'/game'>) {
   }
 
   return (
-    <div className="flex flex-1 flex-col bg-neutral-50 dark:bg-neutral-900">
-      <div className="flex items-baseline justify-between px-4 py-2 bg-white dark:bg-neutral-800 border-b border-neutral-200 dark:border-neutral-700">
-        <h1 className="text-lg font-bold text-neutral-900 dark:text-white">{character.name}</h1>
-        <span className="text-sm text-neutral-500 dark:text-neutral-400">
-          Age {character.age} · {character.country}
-        </span>
+    <div
+      className="flex min-h-0 flex-1 flex-col bg-bg"
+      style={{ '--accent': getStageAccent(character.age) } as CSSProperties}
+    >
+      <div className="flex items-center justify-between px-4 py-2 bg-surface border-b border-border">
+        <div className="flex items-baseline gap-2">
+          {pathname !== '/game' && (
+            <Link
+              href="/game"
+              aria-label="Back to your year"
+              className="text-sm font-semibold text-accent hover:opacity-80"
+            >
+              ← Year
+            </Link>
+          )}
+          <h1 className="text-lg font-bold text-ink">{character.name}</h1>
+        </div>
+        <div className="flex flex-col items-end">
+          <span className="text-sm text-ink-muted">
+            Age {character.age} · {character.country}
+          </span>
+          <span className="text-sm font-semibold text-gold tabular-nums">
+            ${character.money.toLocaleString()}
+          </span>
+        </div>
       </div>
 
-      <StatPanel character={character} />
+      <div className="flex min-h-0 flex-1 flex-col overflow-hidden">{children}</div>
 
-      <div className="flex flex-1 flex-col overflow-hidden">{children}</div>
+      <StatPanel character={character} />
 
       <BottomNav />
     </div>

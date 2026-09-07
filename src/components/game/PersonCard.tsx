@@ -31,14 +31,14 @@ export function PersonCard({
   return (
     <Card className="space-y-2">
       <div className="flex items-baseline justify-between">
-        <p className="font-semibold text-neutral-900 dark:text-white">{person.name}</p>
-        <span className="text-xs text-neutral-500 dark:text-neutral-400">
+        <p className="font-semibold text-ink">{person.name}</p>
+        <span className="text-xs text-ink-muted">
           {RELATION_LABEL[person.relation]} · Age {person.age}
         </span>
       </div>
 
       {!person.alive ? (
-        <p className="text-xs text-neutral-400 dark:text-neutral-500">Deceased</p>
+        <p className="text-xs text-ink-muted">Deceased</p>
       ) : (
         <>
           <ProgressBar label="Relationship" value={person.relationshipMeter} colorClass="bg-pink-500" />

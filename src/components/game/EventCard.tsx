@@ -11,8 +11,8 @@ export function EventCard({
   onChoose: (choiceIndex: number) => void;
 }) {
   return (
-    <div className="mx-4 my-3 rounded-xl border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 p-4 shadow-sm">
-      <p className="text-sm font-medium text-neutral-800 dark:text-neutral-100 mb-3">
+    <div className="mx-4 my-3 rounded-xl border border-border bg-surface p-4 shadow-sm">
+      <p className="text-sm font-medium text-ink mb-3">
         {event.text}
       </p>
       <div className="flex flex-col gap-2">

@@ -41,19 +41,19 @@ export function StockCard({
     <Card className="space-y-2">
       <div className="flex items-center justify-between gap-2">
         <div className="flex items-center gap-2">
-          <p className="font-semibold text-neutral-900 dark:text-white">{definition.symbol}</p>
+          <p className="font-semibold text-ink">{definition.symbol}</p>
           <span
             className={`rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide ${CATEGORY_CLASSES[definition.category]}`}
           >
             {definition.category}
           </span>
         </div>
-        <p className="text-sm font-semibold text-neutral-900 dark:text-white">${price.toLocaleString()}</p>
+        <p className="text-sm font-semibold text-ink">${price.toLocaleString()}</p>
       </div>
-      <p className="text-xs text-neutral-500 dark:text-neutral-400">{definition.name}</p>
-      <p className="text-xs text-neutral-400 dark:text-neutral-500 font-mono">{sparkline}</p>
+      <p className="text-xs text-ink-muted">{definition.name}</p>
+      <p className="text-xs text-ink-muted font-mono">{sparkline}</p>
       {owned > 0 && holding && (
-        <p className="text-xs text-neutral-500 dark:text-neutral-400">
+        <p className="text-xs text-ink-muted">
           You own {owned} share(s) at avg ${holding.avgCost.toFixed(2)}.
         </p>
       )}
@@ -63,7 +63,7 @@ export function StockCard({
           min={1}
           value={quantity}
           onChange={(e) => setQuantity(Math.max(1, Number(e.target.value) || 1))}
-          className="w-20 rounded-lg border border-neutral-300 dark:border-neutral-600 bg-white dark:bg-neutral-800 px-2 py-1 text-sm text-neutral-900 dark:text-white"
+          className="w-20 rounded-lg border border-border bg-surface px-2 py-1 text-sm text-ink"
         />
         <Button onClick={() => onBuy(definition.symbol, shares)} disabled={!canBuy}>
           Buy

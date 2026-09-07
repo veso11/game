@@ -11,10 +11,10 @@ export function EventLog({ history }: { history: HistoryEntry[] }) {
   }, [history.length]);
 
   return (
-    <div className="flex-1 overflow-y-auto px-4 py-3 space-y-2">
+    <div className="min-h-0 flex-1 overflow-y-auto px-4 py-3 space-y-2">
       {history.map((entry) => (
-        <div key={entry.id} className="text-sm text-neutral-700 dark:text-neutral-200">
-          <span className="text-neutral-400 dark:text-neutral-500 mr-2 tabular-nums">
+        <div key={entry.id} className="text-sm text-ink">
+          <span className="text-ink-muted mr-2 tabular-nums">
             {entry.age}
           </span>
           {entry.text}

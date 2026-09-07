@@ -9,17 +9,14 @@ interface NavItem {
   label: string;
 }
 
-const BASE_NAV_ITEMS: NavItem[] = [
-  { href: '/game', label: 'Home' },
+const NAV_ITEMS: NavItem[] = [
   { href: '/game/career', label: 'Career' },
   { href: '/game/relationships', label: 'Relationships' },
-  { href: '/game/education', label: 'Education' },
   { href: '/game/assets', label: 'Assets' },
+  { href: '/game/activities', label: 'Activities' },
 ];
 
-const CASINO_MIN_AGE = 18;
-const CRIME_MIN_AGE = 12;
-const INVESTING_MIN_AGE = 18;
+const ACTIVITIES_MIN_AGE = 12;
 
 export function BottomNav() {
   const pathname = usePathname();
@@ -27,21 +24,12 @@ export function BottomNav() {
   const saves = useGameStore((state) => state.saves);
   const character = activeId ? saves[activeId]?.character : undefined;
 
-  let navItems = BASE_NAV_ITEMS;
-  // Crime/Casino stay visible even while jailed, so the player can keep
-  // checking their sentence countdown on the Crime screen.
-  if (character && character.age >= CRIME_MIN_AGE) {
-    navItems = [...navItems, { href: '/game/crime', label: 'Crime' }];
-  }
-  if (character && character.age >= CASINO_MIN_AGE) {
-    navItems = [...navItems, { href: '/game/casino', label: 'Casino' }];
-  }
-  if (character && character.age >= INVESTING_MIN_AGE) {
-    navItems = [...navItems, { href: '/game/investing', label: 'Investing' }];
-  }
+  const navItems = NAV_ITEMS.filter(
+    (item) => item.href !== '/game/activities' || (character && character.age >= ACTIVITIES_MIN_AGE)
+  );
 
   return (
-    <nav className="flex border-t border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800">
+    <nav className="flex border-t border-border bg-surface">
       {navItems.map((item) => {
         const active = pathname === item.href;
         return (
@@ -49,9 +37,7 @@ export function BottomNav() {
             key={item.href}
             href={item.href}
             className={`flex-1 truncate whitespace-nowrap px-0.5 py-2 text-center text-xs font-semibold transition-colors ${
-              active
-                ? 'text-emerald-600 dark:text-emerald-400'
-                : 'text-neutral-500 dark:text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-200'
+              active ? 'text-accent' : 'text-ink-muted hover:text-ink'
             }`}
           >
             {item.label}
