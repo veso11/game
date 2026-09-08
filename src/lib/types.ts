@@ -126,6 +126,24 @@ export interface CrimeDefinition {
   arrestChanceOnFailure: number;
 }
 
+export interface HealthCondition {
+  id: string;
+  name: string;
+  description: string;
+  yearlyEffects: Partial<Record<StatKey | 'money', number>>;
+  cureChance: number; // 0-1, rolled once per doctor visit
+  worsenChance: number; // 0-1, rolled each yearly tick while untreated
+  worsenPenalty: Partial<Record<StatKey | 'money', number>>; // one-time hit the year it worsens
+  forcesCareerExit?: boolean;
+}
+
+export interface ActiveCondition {
+  conditionId: string;
+  diagnosedAge: number;
+}
+
+export type HealthEffect = { type: 'addCondition'; conditionId: string } | { type: 'cureCondition'; conditionId: string };
+
 export interface StockHolding {
   symbol: string;
   shares: number;
@@ -161,6 +179,8 @@ export interface Character {
   firedEventIds: string[];
   portfolio: StockHolding[];
   market: MarketState;
+  conditions: ActiveCondition[];
+  gymMembership: boolean;
 
   history: HistoryEntry[];
   pendingEventId: string | null;
@@ -183,6 +203,7 @@ export interface EventChoice {
   relationshipEffect?: RelationshipEffect;
   educationEffect?: EducationEffect;
   assetEffect?: AssetEffect;
+  healthEffect?: HealthEffect;
 }
 
 export interface EventRequirements {

@@ -6,25 +6,14 @@ import { applyRelationshipYearlyTick } from '@/lib/engine/relationships';
 import { applyEducationYearlyTick } from '@/lib/engine/education';
 import { applyAssetYearlyTick } from '@/lib/engine/assets';
 import { applyCrimeYearlyTick } from '@/lib/engine/crime';
+import { applyHealthYearlyTick, rollDeath } from '@/lib/engine/health';
 import { applyMarketYearlyTick } from '@/lib/market/engine';
 import { ALL_EVENTS } from '@/lib/data/events';
-import { randInt, chance } from '@/lib/rng';
+import { randInt } from '@/lib/rng';
 import { nanoid } from 'nanoid';
 
 function entry(age: number, text: string): HistoryEntry {
   return { id: nanoid(), age, text };
-}
-
-/**
- * Random death probability curve: near-zero in youth, rising steeply past 70.
- */
-function rollDeath(age: number, health: number): boolean {
-  if (health <= 0) return true;
-  let base = 0;
-  if (age > 70) base = (age - 70) * 0.012;
-  if (age > 90) base += (age - 90) * 0.02;
-  const healthPenalty = health < 30 ? (30 - health) * 0.01 : 0;
-  return chance(Math.min(0.9, base + healthPenalty));
 }
 
 export function ageUp(character: Character): Character {
@@ -54,11 +43,13 @@ export function ageUp(character: Character): Character {
   next = applyRelationshipYearlyTick(next);
   next = applyAssetYearlyTick(next);
   next = applyCrimeYearlyTick(next);
+  next = applyHealthYearlyTick(next);
   next = applyMarketYearlyTick(next);
 
-  if (rollDeath(newAge, next.health)) {
+  const death = rollDeath(next);
+  if (death.died) {
     next.alive = false;
-    next.causeOfDeath = next.health <= 0 ? 'Poor health' : 'Old age';
+    next.causeOfDeath = death.cause;
     next.history = [...next.history, entry(newAge, `You passed away at age ${newAge}. Cause: ${next.causeOfDeath}.`)];
     return next;
   }

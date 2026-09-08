@@ -129,6 +129,22 @@ describe('commitCrime', () => {
     const char = baseCharacter({ age: 20 });
     expect(commitCrime(char, 'nonexistent_crime')).toBe(char);
   });
+
+  it('can injure the character on a failed serious crime, independent of arrest', () => {
+    // 1st call: success roll fails. 2nd call: injury roll hits. 3rd call: arrest roll fails.
+    setRngSource(queueRng([0.9, 0, 0.9]));
+    const char = baseCharacter({ age: 20, history: [] });
+    const next = commitCrime(char, 'grand_theft_auto');
+    expect(next.conditions.map((c) => c.conditionId)).toContain('gunshot_wound');
+    expect(next.history.some((h) => h.text.includes('diagnosed with Gunshot Wound'))).toBe(true);
+  });
+
+  it('never rolls for injury on a petty crime', () => {
+    setRngSource(queueRng([0.9, 0.9]));
+    const char = baseCharacter({ age: 20, history: [] });
+    const next = commitCrime(char, 'pickpocketing');
+    expect(next.conditions).toEqual([]);
+  });
 });
 
 describe('applyCrimeYearlyTick', () => {

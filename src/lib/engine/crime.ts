@@ -2,8 +2,11 @@ import { nanoid } from 'nanoid';
 import type { Character, CrimeDefinition, HistoryEntry } from '@/lib/types';
 import { CRIME_CATALOG, getCrimeById } from '@/lib/data/crimes';
 import { chance, randInt } from '@/lib/rng';
+import { addCondition } from '@/lib/engine/health';
 
 const MAX_CONVICTIONS_SENTENCE_BONUS = 5;
+const INJURY_CHANCE_ON_FAILURE = 0.15;
+const INJURY_ELIGIBLE_SEVERITIES: CrimeDefinition['severity'][] = ['serious', 'major'];
 
 function clamp(min: number, max: number, value: number): number {
   return Math.max(min, Math.min(max, value));
@@ -49,21 +52,26 @@ export function commitCrime(character: Character, crimeId: string): Character {
     return withHistory(next, `You pulled off ${crime.label} and got away with $${reward.toLocaleString()}.`);
   }
 
+  let injured = character;
+  if (INJURY_ELIGIBLE_SEVERITIES.includes(crime.severity) && chance(INJURY_CHANCE_ON_FAILURE)) {
+    injured = addCondition(injured, 'gunshot_wound');
+  }
+
   const caught = chance(crime.arrestChanceOnFailure);
   if (!caught) {
-    return withHistory(character, `You botched the ${crime.label} attempt but got away clean.`);
+    return withHistory(injured, `You botched the ${crime.label} attempt but got away clean.`);
   }
 
   const sentenceYears =
     randInt(crime.sentenceYearsMin, crime.sentenceYearsMax) +
-    Math.min(character.criminalRecord.convictions, MAX_CONVICTIONS_SENTENCE_BONUS);
+    Math.min(injured.criminalRecord.convictions, MAX_CONVICTIONS_SENTENCE_BONUS);
   const next: Character = {
-    ...character,
+    ...injured,
     job: null,
     criminalRecord: {
       inJail: true,
       yearsLeft: sentenceYears,
-      convictions: character.criminalRecord.convictions + 1,
+      convictions: injured.criminalRecord.convictions + 1,
     },
   };
   return withHistory(next, `You were caught committing ${crime.label} and sentenced to ${sentenceYears} year(s) in prison.`);

@@ -55,6 +55,19 @@ describe('ageUp', () => {
     const next = ageUp(char);
     expect(next.alive).toBe(false);
     expect(next.money).toBe(1100);
+    expect(next.causeOfDeath).toBe('Old age');
+  });
+
+  it('attributes death to an active condition when health drops to 0', () => {
+    setRngSource(() => 0); // minimum drift, condition worsen roll always hits
+    const char = baseCharacter({
+      age: 30,
+      health: 1,
+      conditions: [{ conditionId: 'smoker', diagnosedAge: 20 }],
+    });
+    const next = ageUp(char);
+    expect(next.alive).toBe(false);
+    expect(next.causeOfDeath).toBe('Smoking Habit');
   });
 
   it('runs the full tick chain together: education, career, and asset upkeep in one year', () => {

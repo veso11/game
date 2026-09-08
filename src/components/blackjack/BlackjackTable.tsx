@@ -5,6 +5,7 @@ import { createShoe, shuffle, dealInitial, hit, stand, settle, handValue } from 
 import type { Card as CardType, GameState } from '@/lib/blackjack/types';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
+import { AmountSlider } from '@/components/ui/AmountSlider';
 
 const INITIAL_STATE: GameState = { deck: [], playerHand: [], dealerHand: [], phase: 'betting', bet: 0 };
 
@@ -84,17 +85,9 @@ export function BlackjackTable({ money, onSettle }: { money: number; onSettle: (
       )}
 
       {inBettingPhase ? (
-        <div className="flex items-center gap-2">
-          <input
-            type="number"
-            min={1}
-            max={Math.max(1, maxBet)}
-            value={betInput}
-            onChange={(e) => setBetInput(Math.max(1, Math.min(Math.max(1, maxBet), Number(e.target.value) || 1)))}
-            disabled={!canPlay}
-            className="w-24 rounded-lg border border-border bg-surface px-2 py-1 text-sm text-ink disabled:opacity-40"
-          />
-          <Button onClick={handleDeal} disabled={!canPlay}>
+        <div className="space-y-3">
+          <AmountSlider label="Bet" value={betInput} max={maxBet} onChange={setBetInput} />
+          <Button className="w-full" onClick={handleDeal} disabled={!canPlay}>
             Deal
           </Button>
         </div>

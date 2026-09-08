@@ -19,6 +19,13 @@ import {
 import { enroll as runEnroll, dropOut as runDropOut, study as runStudy } from '@/lib/engine/education';
 import { buyAsset as runBuyAsset, sellAsset as runSellAsset } from '@/lib/engine/assets';
 import { commitCrime as runCommitCrime } from '@/lib/engine/crime';
+import {
+  visitDoctor as runVisitDoctor,
+  toggleGymMembership as runToggleGymMembership,
+  goForWalk as runGoForWalk,
+  doGardening as runDoGardening,
+  readABook as runReadABook,
+} from '@/lib/engine/health';
 import { buy as runBuyStock, sell as runSellStock, initMarket } from '@/lib/market/engine';
 import { getEventById } from '@/lib/data/events';
 import { randomName, randomCountry } from '@/lib/data/names';
@@ -48,6 +55,8 @@ function newCharacter(opts: { name?: string; country?: string }): Character {
     firedEventIds: [],
     portfolio: [],
     market: initMarket(),
+    conditions: [],
+    gymMembership: false,
     history: [{ id: nanoid(), age: 0, text: `${name} was born in ${country}.` }],
     pendingEventId: null,
     eventQueue: [],
@@ -82,6 +91,11 @@ interface GameState {
   commitCrime: (crimeId: string) => void;
   buyStock: (symbol: string, shares: number) => void;
   sellStock: (symbol: string, shares: number) => void;
+  visitDoctor: () => void;
+  toggleGymMembership: () => void;
+  goForWalk: () => void;
+  doGardening: () => void;
+  readABook: () => void;
 }
 
 export const useGameStore = create<GameState>()(
@@ -372,6 +386,76 @@ export const useGameStore = create<GameState>()(
         const current = saves[activeId].character;
         if (!current.alive || current.pendingEventId || current.criminalRecord.inJail) return;
         const { character: nextCharacter } = runSellStock(current, symbol, shares);
+        set((state) => ({
+          saves: {
+            ...state.saves,
+            [activeId]: { character: nextCharacter, lastPlayed: Date.now() },
+          },
+        }));
+      },
+
+      visitDoctor: () => {
+        const { activeId, saves } = get();
+        if (!activeId || !saves[activeId]) return;
+        const current = saves[activeId].character;
+        if (!current.alive || current.pendingEventId || current.criminalRecord.inJail) return;
+        const nextCharacter = runVisitDoctor(current);
+        set((state) => ({
+          saves: {
+            ...state.saves,
+            [activeId]: { character: nextCharacter, lastPlayed: Date.now() },
+          },
+        }));
+      },
+
+      toggleGymMembership: () => {
+        const { activeId, saves } = get();
+        if (!activeId || !saves[activeId]) return;
+        const current = saves[activeId].character;
+        if (!current.alive || current.pendingEventId || current.criminalRecord.inJail) return;
+        const nextCharacter = runToggleGymMembership(current);
+        set((state) => ({
+          saves: {
+            ...state.saves,
+            [activeId]: { character: nextCharacter, lastPlayed: Date.now() },
+          },
+        }));
+      },
+
+      goForWalk: () => {
+        const { activeId, saves } = get();
+        if (!activeId || !saves[activeId]) return;
+        const current = saves[activeId].character;
+        if (!current.alive || current.pendingEventId || current.criminalRecord.inJail) return;
+        const nextCharacter = runGoForWalk(current);
+        set((state) => ({
+          saves: {
+            ...state.saves,
+            [activeId]: { character: nextCharacter, lastPlayed: Date.now() },
+          },
+        }));
+      },
+
+      doGardening: () => {
+        const { activeId, saves } = get();
+        if (!activeId || !saves[activeId]) return;
+        const current = saves[activeId].character;
+        if (!current.alive || current.pendingEventId || current.criminalRecord.inJail) return;
+        const nextCharacter = runDoGardening(current);
+        set((state) => ({
+          saves: {
+            ...state.saves,
+            [activeId]: { character: nextCharacter, lastPlayed: Date.now() },
+          },
+        }));
+      },
+
+      readABook: () => {
+        const { activeId, saves } = get();
+        if (!activeId || !saves[activeId]) return;
+        const current = saves[activeId].character;
+        if (!current.alive || current.pendingEventId || current.criminalRecord.inJail) return;
+        const nextCharacter = runReadABook(current);
         set((state) => ({
           saves: {
             ...state.saves,

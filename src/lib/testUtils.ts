@@ -24,6 +24,8 @@ export function baseCharacter(overrides: Partial<Character> = {}): Character {
     firedEventIds: [],
     portfolio: [],
     market: initMarket(),
+    conditions: [],
+    gymMembership: false,
     history: [],
     pendingEventId: null,
     eventQueue: [],

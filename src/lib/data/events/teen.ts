@@ -62,7 +62,12 @@ export const TEEN_EVENTS: LifeEvent[] = [
     text: 'Friends are pressuring you to try smoking.',
     choices: [
       { label: 'Refuse', effects: { happiness: -1, smarts: 1 }, resultText: 'You stood your ground, even though it was awkward.' },
-      { label: 'Give in', effects: { health: -6, happiness: 2 }, resultText: 'You regretted it almost immediately.' },
+      {
+        label: 'Give in',
+        effects: { health: -6, happiness: 2 },
+        resultText: 'You regretted it almost immediately.',
+        healthEffect: { type: 'addCondition', conditionId: 'smoker' },
+      },
     ],
   },
   {

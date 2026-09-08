@@ -5,6 +5,7 @@ import type { StockDefinition } from '@/lib/market/types';
 import type { StockHolding } from '@/lib/types';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
+import { AmountSlider } from '@/components/ui/AmountSlider';
 
 const CATEGORY_CLASSES: Record<StockDefinition['category'], string> = {
   stock: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200',
@@ -28,14 +29,20 @@ export function StockCard({
   onBuy: (symbol: string, shares: number) => void;
   onSell: (symbol: string, shares: number) => void;
 }) {
-  const [quantity, setQuantity] = useState(1);
+  const [buyAmount, setBuyAmount] = useState(1);
+  const [sellAmount, setSellAmount] = useState(1);
 
   const sparkline = history.slice(-8).join(' → ');
-  const shares = Math.max(1, Math.floor(quantity) || 1);
-  const buyCost = price * shares;
-  const canBuy = buyCost <= money;
   const owned = holding?.shares ?? 0;
-  const canSell = owned >= shares;
+  const positionValue = Math.floor(owned * price);
+
+  const canAffordOne = money >= price;
+  const buyShares = Math.max(1, Math.floor(buyAmount / price));
+  const canBuy = canAffordOne && buyShares >= 1;
+
+  const canSellAny = owned > 0;
+  const sellShares = Math.min(owned, Math.max(1, Math.floor(sellAmount / price)));
+  const canSell = canSellAny && sellShares >= 1;
 
   return (
     <Card className="space-y-2">
@@ -57,21 +64,27 @@ export function StockCard({
           You own {owned} share(s) at avg ${holding.avgCost.toFixed(2)}.
         </p>
       )}
-      <div className="flex items-center gap-2">
-        <input
-          type="number"
-          min={1}
-          value={quantity}
-          onChange={(e) => setQuantity(Math.max(1, Number(e.target.value) || 1))}
-          className="w-20 rounded-lg border border-border bg-surface px-2 py-1 text-sm text-ink"
-        />
-        <Button onClick={() => onBuy(definition.symbol, shares)} disabled={!canBuy}>
+
+      <div className="space-y-2 pt-1">
+        <AmountSlider label={`Buy (${buyShares} sh)`} value={buyAmount} max={money} onChange={setBuyAmount} />
+        <Button className="w-full" onClick={() => onBuy(definition.symbol, buyShares)} disabled={!canBuy}>
           Buy
         </Button>
-        <Button variant="secondary" onClick={() => onSell(definition.symbol, shares)} disabled={!canSell}>
-          Sell
-        </Button>
       </div>
+
+      {canSellAny && (
+        <div className="space-y-2 pt-1">
+          <AmountSlider
+            label={`Sell (${sellShares} sh)`}
+            value={sellAmount}
+            max={positionValue}
+            onChange={setSellAmount}
+          />
+          <Button className="w-full" variant="secondary" onClick={() => onSell(definition.symbol, sellShares)} disabled={!canSell}>
+            Sell
+          </Button>
+        </div>
+      )}
     </Card>
   );
 }

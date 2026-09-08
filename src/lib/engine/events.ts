@@ -5,6 +5,7 @@ import { applyJobEffect } from '@/lib/engine/career';
 import { applyRelationshipEffect } from '@/lib/engine/relationships';
 import { applyEducationEffect } from '@/lib/engine/education';
 import { applyAssetEffect } from '@/lib/engine/assets';
+import { applyHealthEffect } from '@/lib/engine/health';
 import { nanoid } from 'nanoid';
 
 export function relationshipStatus(character: Character): RelationshipStatus {
@@ -110,6 +111,7 @@ export function resolveEvent(
   if (choice.relationshipEffect) next = applyRelationshipEffect(next, choice.relationshipEffect);
   if (choice.educationEffect) next = applyEducationEffect(next, choice.educationEffect);
   if (choice.assetEffect) next = applyAssetEffect(next, choice.assetEffect);
+  if (choice.healthEffect) next = applyHealthEffect(next, choice.healthEffect);
 
   const entry: HistoryEntry = {
     id: nanoid(),

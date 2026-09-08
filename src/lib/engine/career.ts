@@ -2,6 +2,9 @@ import { nanoid } from 'nanoid';
 import type { Character, EducationState, HistoryEntry, Job, JobEffect, JobListing } from '@/lib/types';
 import { JOB_CATALOG, getJobListingById } from '@/lib/data/jobs';
 import { chance, randInt } from '@/lib/rng';
+import { addCondition } from '@/lib/engine/health';
+
+const SPORTS_INJURY_CHANCE = 0.05;
 
 const EDUCATION_LEVEL_ORDER: EducationState['level'][] = [
   'none',
@@ -207,6 +210,10 @@ export function applyCareerYearlyTick(character: Character): Character {
       { ...next, job: null, happiness: Math.max(0, next.happiness - 10) },
       `You were let go from your job as ${title}.`
     );
+  }
+
+  if (next.job && listing?.field === 'sports' && chance(SPORTS_INJURY_CHANCE)) {
+    next = addCondition(next, 'career_ending_injury');
   }
 
   return next;

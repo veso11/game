@@ -466,6 +466,28 @@ describe('applyCareerYearlyTick', () => {
     expect(next.job?.salaryPerYear).toBeGreaterThanOrEqual(25000);
     expect(next.job?.salaryPerYear).toBe(25000);
   });
+
+  it('can roll a career-ending injury for a sports listing', () => {
+    // drift -5 (perf 50 -> 45, no promo/fire branch), injury chance(0.05) true
+    setRngSource(() => 0);
+    const char = baseCharacter({
+      job: job({ listingId: 'soccer_player', title: 'Soccer Player', level: 1, performance: 50 }),
+      history: [],
+    });
+    const next = applyCareerYearlyTick(char);
+    expect(next.job).toBeNull();
+    expect(next.conditions.map((c) => c.conditionId)).toContain('career_ending_injury');
+  });
+
+  it('never rolls an injury for a non-sports listing', () => {
+    setRngSource(() => 0);
+    const char = baseCharacter({
+      job: job({ listingId: 'fast_food_worker', title: 'Fast Food Worker', level: 1, performance: 50 }),
+      history: [],
+    });
+    const next = applyCareerYearlyTick(char);
+    expect(next.conditions).toEqual([]);
+  });
 });
 
 describe('fame careers (singer/actor/sports)', () => {
